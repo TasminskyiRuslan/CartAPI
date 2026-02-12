@@ -5,7 +5,12 @@ namespace App\Models;
 use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\HigherOrderCollectionProxy;
 
+/**
+ * @property HigherOrderCollectionProxy|mixed $price
+ * @method static find(mixed $product_id)
+ */
 class Product extends Model
 {
     /** @use HasFactory<ProductFactory> */
@@ -33,5 +38,13 @@ class Product extends Model
         return [
             'price' => 'decimal:2',
         ];
+    }
+
+    /**
+     * Get the cart items for the product.
+     */
+    public function cartItems(): void
+    {
+        $this->hasMany(CartItem::class);
     }
 }
