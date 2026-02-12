@@ -1,0 +1,101 @@
+services:
+  app:
+    build: .
+    image: cart-api-php:dev
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - .:/var/www/html:cached
+    networks:
+      - cart-api-net
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  queue:
+    image: cart-api-php:dev
+    restart: unless-stopped
+    command: php artisan queue:work --tries=3 --timeout=90 --sleep=3 --max-time=3600
+    env_file:
+      - .env
+    volumes:
+      - .:/var/www/html:cached
+    networks:
+      - cart-api-net
+    depends_on:
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+
+  scheduler:
+    image: cart-api-php:dev
+    restart: unless-stopped
+    command: php artisan schedule:work
+    env_file:
+      - .env
+    volumes:
+      - .:/var/www/html:cached
+    networks:
+      - cart-api-net
+    depends_on:
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html:cached
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - cart-api-net
+    depends_on:
+      app:
+        condition: service_started
+
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "33061:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - cart-api-net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - cart-api-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+networks:
+  cart-api-net:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:
