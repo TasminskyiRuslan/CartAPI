@@ -13,10 +13,10 @@ class CartSeeder extends Seeder
      */
     public function run(): void
     {
-        User::query()->each(function ($user) {
-            Cart::factory()->forUser($user)->create();
+        User::lazy()->each(function ($user) {
+            Cart::factory()->for($user)->create();
         });
 
-        Cart::factory()->count(5)->create();
+        Cart::factory()->guest()->count(5)->create();
     }
 }

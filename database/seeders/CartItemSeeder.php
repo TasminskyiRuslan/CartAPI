@@ -14,16 +14,12 @@ class CartItemSeeder extends Seeder
      */
     public function run(): void
     {
-        $products = Product::all();
-
-        Cart::query()->each(function ($cart) use ($products) {
-            CartItem::factory()
-                ->count(rand(1, 4))
-                ->for($cart)
-                ->state(fn () => [
-                    'product_id' => $products->random()->id,
-                ])
-                ->create();
+        Cart::lazy()->each(function ($cart) {
+            Product::lazy()->take(rand(1, Product::count()))->each(function ($product) use ($cart) {
+                CartItem::factory()->for($cart)->for($product)->create([
+                    'quantity' => rand(1, 15),
+                ]);
+            });
         });
     }
 }

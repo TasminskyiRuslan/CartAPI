@@ -22,10 +22,20 @@ class CartItemFactory extends Factory
         return [
             'cart_id' => Cart::factory(),
             'product_id' => Product::factory(),
-            'price_snapshot' => function (array $attributes) {
-                return Product::find($attributes['product_id'])->price;
-            },
+            'price_snapshot' => null,
             'quantity' => fake()->numberBetween(1, 15),
         ];
+    }
+
+    /**
+     * Configure the factory to set the price snapshot after making a CartItem.
+     *
+     * @return static
+     */
+    public function configure(): static
+    {
+        return $this->afterMaking(function (CartItem $item) {
+            $item->price_snapshot ??= $item->product?->price;
+        });
     }
 }

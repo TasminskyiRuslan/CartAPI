@@ -19,22 +19,21 @@ class CartFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => null,
-            'guest_token' => fake()->uuid(),
+            'user_id' => User::factory(),
+            'guest_token' => null,
         ];
     }
 
     /**
-     * Indicate that the cart belongs to a specific user.
+     * Indicate that the cart belongs to a guest user.
      *
-     * @param User $user
      * @return static
      */
-    public function forUser(User $user): static
+    public function guest(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'user_id' => $user->id,
-            'guest_token' => null,
+        return $this->state(fn () => [
+            'user_id' => null,
+            'guest_token' => fake()->uuid(),
         ]);
     }
 }

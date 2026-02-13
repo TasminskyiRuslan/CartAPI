@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property mixed $product
+ */
 class CartItem extends Model
 {
     /** @use HasFactory<CartItemFactory> */
@@ -38,7 +41,7 @@ class CartItem extends Model
     }
 
     /**
-     * Get the cart that owns the cart item.
+     * Get the product that owns the cart item.
      */
     public function product(): BelongsTo
     {
@@ -46,7 +49,7 @@ class CartItem extends Model
     }
 
     /**
-     * Get the product that owns the cart item.
+     * Get the cart that owns the cart item.
      */
     public function cart(): BelongsTo
     {

@@ -6,7 +6,11 @@ use Database\Factories\CartFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @method static lazy()
+ */
 class Cart extends Model
 {
     /** @use HasFactory<CartFactory> */
@@ -33,7 +37,7 @@ class Cart extends Model
     /**
      * Get the cart items for the cart.
      */
-    public function cartItems()
+    public function cartItems(): HasMany
     {
         return $this->hasMany(CartItem::class);
     }
