@@ -9,7 +9,7 @@ use Illuminate\Database\Seeder;
 class CartSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * This seeder populates the carts table by creating a cart for each existing user and also creating a few carts for guest users. It uses the Cart factory to generate the cart records, associating them with users where applicable and assigning a unique guest token for guest carts.
      */
     public function run(): void
     {

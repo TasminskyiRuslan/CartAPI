@@ -2,21 +2,24 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 /**
  * @property mixed $id
  * @method static lazy()
+ * @method static create(mixed[] $toArray)
+ * @method createToken(string $string)
+ * @method static where(string $string, $email)
  */
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -54,6 +57,8 @@ class User extends Authenticatable
 
     /**
      * Get the cart associated with the user.
+     *
+     * @return HasOne<Cart>
      */
     public function cart(): HasOne
     {

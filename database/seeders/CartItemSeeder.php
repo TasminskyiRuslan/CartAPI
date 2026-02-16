@@ -10,7 +10,7 @@ use Illuminate\Database\Seeder;
 class CartItemSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * This seeder populates the cart_items table by iterating through each cart and adding a random selection of products as cart items, with random quantities between 1 and 15.
      */
     public function run(): void
     {

@@ -45,6 +45,8 @@ class Product extends Model
 
     /**
      * Get the cart items for the product.
+     *
+     * @return HasMany<CartItem>
      */
     public function cartItems(): HasMany
     {
