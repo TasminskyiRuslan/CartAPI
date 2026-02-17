@@ -4,14 +4,14 @@ namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\IssueTokenAction;
 use App\Actions\Auth\RegisterUserAction;
-use App\Data\Auth\AuthData;
-use App\Data\Auth\RegisterUserData;
-use App\Data\Auth\UserData;
+use App\Data\Auth\Requests\RegisterUserData;
+use App\Data\Auth\Responses\AuthData;
+use App\Data\Auth\Responses\UserData;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
-use Throwable;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Throwable;
 
 class RegisterController extends Controller
 {

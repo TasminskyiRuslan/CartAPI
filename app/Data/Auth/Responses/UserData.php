@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Data\Auth;
+namespace App\Data\Auth\Responses;
 
 use DateTimeInterface;
 use Spatie\LaravelData\Attributes\MapName;
-use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;

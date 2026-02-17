@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Data\Auth;
+namespace App\Data\Auth\Requests;
 
 use App\Data\Casts\LowercaseCast;
 use Spatie\LaravelData\Attributes\Validation\Confirmed;

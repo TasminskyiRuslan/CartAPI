@@ -1,6 +1,6 @@
 <?php
 
-use App\Data\Auth\UserData;
+use App\Data\Auth\Responses\UserData;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;

@@ -2,7 +2,7 @@
 
 namespace App\Actions\Auth;
 
-use App\Data\Auth\RegisterUserData;
+use App\Data\Auth\Requests\RegisterUserData;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Throwable;
