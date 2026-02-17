@@ -47,6 +47,29 @@
                 }
             }
         },
+        "/auth/logout": {
+            "delete": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout current device",
+                "description": "Revoke the authentication token for the authenticated user.",
+                "operationId": "23a3ec5e2e8d20c9fd2ea568ae96fcd3",
+                "responses": {
+                    "204": {
+                        "description": "User logged out"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/auth/me": {
             "get": {
                 "tags": [
