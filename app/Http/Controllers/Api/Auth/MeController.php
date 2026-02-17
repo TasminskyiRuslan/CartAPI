@@ -11,6 +11,24 @@ use OpenApi\Attributes as OA;
 
 class MeController extends Controller
 {
+    #[OA\Get(
+        path: '/auth/me',
+        description: 'Get the authenticated user\'s data.',
+        summary: 'Get authenticated user',
+        security: [['sanctum' => []]],
+        tags: ['Auth'],
+        responses: [
+            new OA\Response(
+                response: SymfonyResponse::HTTP_OK,
+                description: 'Authenticated user data',
+                content: new OA\JsonContent(ref: '#/components/schemas/User')
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNAUTHORIZED,
+                description: 'Unauthorized'
+            )
+        ]
+    )]
     /**
      * Handle the incoming request to get the authenticated user's information.
      *
