@@ -46,6 +46,12 @@ function something()
     // ..
 }
 
+/*
+|--------------------------------------------------------------------------
+| payloads
+|--------------------------------------------------------------------------
+*/
+
 /**
  * Generate a registration payload with optional overrides.
  *
@@ -61,6 +67,12 @@ function registrationPayload(array $overrides = []): array
         'password_confirmation' => 'password123',
     ], $overrides);
 }
+
+/*
+|--------------------------------------------------------------------------
+| json structures
+|--------------------------------------------------------------------------
+*/
 
 /**
  * Get the expected JSON structure for a user object.

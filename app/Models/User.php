@@ -7,15 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\HigherOrderCollectionProxy;
 use Laravel\Sanctum\HasApiTokens;
 
-/**
- * @property mixed $id
- * @method static lazy()
- * @method static create(mixed[] $toArray)
- * @method createToken(string $string)
- * @method static where(string $string, $email)
- */
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */

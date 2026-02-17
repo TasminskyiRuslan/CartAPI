@@ -6,14 +6,7 @@ use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\HigherOrderCollectionProxy;
 
-/**
- * @property HigherOrderCollectionProxy|mixed $price
- * @method static find(mixed $product_id)
- * @method static lazy()
- * @method static count()
- */
 class Product extends Model
 {
     /** @use HasFactory<ProductFactory> */
