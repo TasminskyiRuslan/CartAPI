@@ -2,6 +2,7 @@
 
 use App\Data\Auth\Responses\UserData;
 use App\Http\Controllers\Api\Auth\LoginController;
+use App\Http\Controllers\Api\Auth\MeController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -13,9 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 Route::prefix('auth')->group(callback: function () {
     // Me action
-    Route::get('/me', function (Request $request) {
-        return UserData::from($request->user());
-    })
+    Route::get('/me', MeController::class)
         ->middleware('auth:sanctum')
         ->name('auth.me');
 
