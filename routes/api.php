@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 | Authentication actions
 |--------------------------------------------------------------------------
 */
-Route::prefix('auth')->group(function () {
+Route::prefix('auth')->group(callback: function () {
     // Me action
     Route::get('/me', function (Request $request) {
         return UserData::from($request->user());

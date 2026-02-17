@@ -11,9 +11,31 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Throwable;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use OpenApi\Attributes as OA;
 
 class RegisterController extends Controller
 {
+    #[OA\Post(
+        path: '/auth/register',
+        description: 'Register a new user.',
+        summary: 'Register',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: '#/components/schemas/RegisterUserRequest')
+        ),
+        tags: ['Auth'],
+        responses: [
+            new OA\Response(
+                response: SymfonyResponse::HTTP_CREATED,
+                description: 'User registered',
+                content: new OA\JsonContent(ref: '#/components/schemas/Auth')
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
+                description: 'Validation error'
+            ),
+        ]
+    )]
     /**
      * Handle the incoming registration request.
      *

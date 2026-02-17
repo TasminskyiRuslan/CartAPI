@@ -4,7 +4,10 @@ namespace App\Data\Auth;
 
 use DateTimeInterface;
 use Spatie\LaravelData\Attributes\MapName;
+use Spatie\LaravelData\Attributes\WithCast;
+use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 
 class UserData extends Data
 {
@@ -23,9 +26,11 @@ class UserData extends Data
         public string $email,
 
         #[MapName('created_at')]
+        #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d\TH:i:s\Z')]
         public DateTimeInterface $createdAt,
 
         #[MapName('updated_at')]
+        #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d\TH:i:s\Z')]
         public DateTimeInterface $updatedAt,
     ) {}
 }
