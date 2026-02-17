@@ -9,9 +9,31 @@ use App\Data\Auth\Responses\UserData;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use OpenApi\Attributes as OA;
 
 class LoginController extends Controller
 {
+    #[OA\Post(
+        path: '/auth/login',
+        description: 'Authenticate user.',
+        summary: 'Login',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: '#/components/schemas/LoginUserRequest')
+        ),
+        tags: ['Auth'],
+        responses: [
+            new OA\Response(
+                response: SymfonyResponse::HTTP_OK,
+                description: 'User logged in',
+                content: new OA\JsonContent(ref: '#/components/schemas/Auth')
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
+                description: 'Validation error'
+            ),
+        ]
+    )]
     /**
      * Handle the incoming login request.
      *
