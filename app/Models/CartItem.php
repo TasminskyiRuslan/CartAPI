@@ -56,4 +56,18 @@ class CartItem extends Model
     {
         return $this->belongsTo(Cart::class);
     }
+
+    /**
+     * Calculate the total price for the cart item based on the price snapshot and quantity.
+     *
+     * @return string The total price for the cart item, formatted as a decimal string with 2 decimal places.
+     */
+    public function calculateTotalPrice(): string
+    {
+        return bcmul(
+            (string) $this->price_snapshot,
+            (string) $this->quantity,
+            2
+        );
+    }
 }
