@@ -13,10 +13,10 @@ use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Data;
 
-class RegisterUserRequestData extends Data
+class RegisterUserData extends Data
 {
     /**
-     * Create a new instance of RegisterUserRequestData.
+     * Create a new instance of RegisterUserData.
      *
      * @param string $name The name of the user to register.
      * @param string $email The email address of the user to register.

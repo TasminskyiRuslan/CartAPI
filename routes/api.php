@@ -1,6 +1,6 @@
 <?php
 
-use App\Data\Auth\Responses\UserResponseData;
+use App\Data\Auth\Responses\UserData;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\LogoutController;
 use App\Http\Controllers\Api\Auth\MeController;

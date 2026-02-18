@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\RegisterUserAction;
-use App\Data\Auth\Requests\RegisterUserRequestData;
-use App\Data\Auth\Responses\AuthResponseData;
-use App\Data\Auth\Responses\UserResponseData;
+use App\Data\Auth\Requests\RegisterUserData;
+use App\Data\Auth\Responses\AuthData;
+use App\Data\Auth\Responses\UserData;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
@@ -38,17 +38,17 @@ class RegisterController extends Controller
     /**
      * Handle the incoming registration request.
      *
-     * @param RegisterUserRequestData $data The data for registering a new user.
+     * @param RegisterUserData $data The data for registering a new user.
      * @param RegisterUserAction $action The action to handle user registration.
      * @return JsonResponse A JSON response containing the authenticated user's data and access token.
      * @throws Throwable If an error occurs during the registration process.
      */
-    public function __invoke(RegisterUserRequestData $data, RegisterUserAction $action): JsonResponse
+    public function __invoke(RegisterUserData $data, RegisterUserAction $action): JsonResponse
     {
         [$user, $token] = $action->handle($data);
 
-        $authData = new AuthResponseData(
-            user: UserResponseData::from($user),
+        $authData = new AuthData(
+            user: UserData::from($user),
             accessToken: $token
         );
 
