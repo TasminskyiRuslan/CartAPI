@@ -8,10 +8,10 @@ use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 
-class UserData extends Data
+class UserResponseData extends Data
 {
     /**
-     * Create a new instance of UserData.
+     * Create a new instance of UserResponseData.
      *
      * @param int $id The unique identifier of the user.
      * @param string $name The name of the user.

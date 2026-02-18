@@ -10,10 +10,10 @@ use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Data;
 
-class LoginUserData extends Data
+class LoginUserRequestData extends Data
 {
     /**
-     * Create a new instance of LoginUserData.
+     * Create a new instance of LoginUserRequestData.
      *
      * @param string $email The email address of the user to log in.
      * @param string $password The password for the user to log in.

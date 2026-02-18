@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
-use App\Data\Auth\Responses\UserData;
+use App\Data\Auth\Responses\UserResponseData;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -37,7 +37,7 @@ class MeController extends Controller
      */
     public function __invoke(Request $request)
     {
-        return UserData::from($request->user())
+        return UserResponseData::from($request->user())
             ->toResponse($request)
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
