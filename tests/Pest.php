@@ -99,3 +99,37 @@ function authJsonStructure(): array {
         'token_type',
     ];
 }
+
+function productJsonStructure(): array
+{
+    return [
+        'id',
+        'name',
+        'description',
+        'price',
+        'image_path',
+    ];
+}
+
+function cartItemJsonStructure(): array
+{
+    return [
+        'id',
+        'price_snapshot',
+        'quantity',
+        'total_price',
+        'product' => productJsonStructure(),
+    ];
+}
+
+function cartJsonStructure(): array
+{
+    return [
+        'id',
+        'items' => [
+            '*' => cartItemJsonStructure(),
+        ],
+        'total_items',
+        'total_price',
+    ];
+}

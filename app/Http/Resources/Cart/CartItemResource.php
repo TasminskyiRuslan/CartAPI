@@ -29,7 +29,7 @@ class CartItemResource extends JsonResource
             'price_snapshot' => $this->price_snapshot,
             'quantity' => $this->quantity,
             'total_price' => $this->calculateTotalPrice(),
-            'product' => new ProductResource($this->whenLoaded('product')),
+            'product' => new ProductResource($this->product),
         ];
     }
 }
