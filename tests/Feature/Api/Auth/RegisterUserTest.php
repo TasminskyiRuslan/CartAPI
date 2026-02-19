@@ -68,10 +68,10 @@ describe('RegisterController', function () {
 
             postJson(route('auth.register'), $data)
                 ->assertCreated()
-                ->assertJsonPath('user.email', $data['email'])
-                ->assertJsonStructure(
-                    authJsonStructure(),
-                );
+                ->assertJsonPath('data.user.email', $data['email'])
+                ->assertJsonStructure([
+                    'data' => authJsonStructure()
+                ]);
 
             $user = User::where('email', $data['email'])->first();
 

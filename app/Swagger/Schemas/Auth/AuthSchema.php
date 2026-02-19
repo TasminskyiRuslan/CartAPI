@@ -26,7 +26,7 @@ use OpenApi\Attributes as OA;
             description: 'Type of the token for Authorization header',
             type: 'string',
             example: 'Bearer'
-        ),
+        )
     ],
     type: 'object'
 )]

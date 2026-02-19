@@ -4,9 +4,8 @@ namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\RegisterUserAction;
 use App\Data\Auth\Requests\RegisterUserData;
-use App\Data\Auth\Responses\AuthData;
-use App\Data\Auth\Responses\UserData;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Auth\AuthResource;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -27,7 +26,14 @@ class RegisterController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_CREATED,
                 description: 'User registered',
-                content: new OA\JsonContent(ref: '#/components/schemas/Auth')
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            ref: '#/components/schemas/Auth'
+                        )
+                    ]
+                )
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
@@ -45,15 +51,10 @@ class RegisterController extends Controller
      */
     public function __invoke(RegisterUserData $data, RegisterUserAction $action): JsonResponse
     {
-        [$user, $token] = $action->handle($data);
+        $authData = $action->handle($data);
 
-        $authData = new AuthData(
-            user: UserData::from($user),
-            accessToken: $token
-        );
-
-        return $authData
-            ->toResponse(request())
+        return AuthResource::make($authData)
+            ->response()
             ->setStatusCode(SymfonyResponse::HTTP_CREATED);
     }
 }

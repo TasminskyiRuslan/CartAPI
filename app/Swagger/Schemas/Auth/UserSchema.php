@@ -28,21 +28,7 @@ use OpenApi\Attributes as OA;
             type: 'string',
             format: 'email',
             example: 'john@example.com'
-        ),
-        new OA\Property(
-            property: 'created_at',
-            description: 'The user registered at',
-            type: 'string',
-            format: 'date-time',
-            example: '2026-01-01T12:00:00Z'
-        ),
-        new OA\Property(
-            property: 'updated_at',
-            description: 'The user last updated at',
-            type: 'string',
-            format: 'date-time',
-            example: '2026-01-10T12:00:00Z'
-        ),
+        )
     ],
     type: 'object'
 )]

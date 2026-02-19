@@ -72,8 +72,10 @@ describe('LoginController', function () {
 
             postJson(route('auth.login'), $data)
                 ->assertOk()
-                ->assertJsonPath('user.email', $data['email'])
-                ->assertJsonStructure(authJsonStructure());
+                ->assertJsonPath('data.user.email', $data['email'])
+                ->assertJsonStructure([
+                    'data' => authJsonStructure()
+                ]);
         });
     });
 

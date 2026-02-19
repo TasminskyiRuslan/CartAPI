@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
-use App\Data\Auth\Responses\UserData;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Auth\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class MeController extends Controller
 {
@@ -21,7 +21,14 @@ class MeController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_OK,
                 description: 'Authenticated user data',
-                content: new OA\JsonContent(ref: '#/components/schemas/User')
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            ref: '#/components/schemas/User'
+                        )
+                    ]
+                )
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNAUTHORIZED,
@@ -35,10 +42,10 @@ class MeController extends Controller
      * @param Request $request The incoming HTTP request.
      * @return JsonResponse A JSON response containing the authenticated user's data.
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): JsonResponse
     {
-        return UserData::from($request->user())
-            ->toResponse($request)
+        return (new UserResource($request->user()))
+            ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 }

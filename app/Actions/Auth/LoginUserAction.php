@@ -2,6 +2,7 @@
 
 namespace App\Actions\Auth;
 
+use App\Data\Auth\AuthData;
 use App\Data\Auth\Requests\LoginUserData;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -24,10 +25,10 @@ class LoginUserAction
      * Handle the user login process.
      *
      * @param LoginUserData $data The data for logging in a user.
-     * @return array{0: User, 1: string} An array containing the authenticated user and the issued token.
      * @throws ValidationException If the provided credentials are invalid.
+     * @return AuthData An array containing the authenticated user and the issued token.
      */
-    public function handle(LoginUserData $data): array
+    public function handle(LoginUserData $data): AuthData
     {
         $user = User::where('email', $data->email)->first();
 
@@ -39,6 +40,9 @@ class LoginUserAction
 
         $token = $this->issueTokenAction->handle($user);
 
-        return [$user, $token];
+        return new AuthData(
+            user: $user,
+            token: $token,
+        );
     }
 }

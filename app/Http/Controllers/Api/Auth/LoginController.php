@@ -4,12 +4,11 @@ namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\LoginUserAction;
 use App\Data\Auth\Requests\LoginUserData;
-use App\Data\Auth\Responses\AuthData;
-use App\Data\Auth\Responses\UserData;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Auth\AuthResource;
 use Illuminate\Http\JsonResponse;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class LoginController extends Controller
 {
@@ -26,7 +25,14 @@ class LoginController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_OK,
                 description: 'User logged in',
-                content: new OA\JsonContent(ref: '#/components/schemas/Auth')
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            ref: '#/components/schemas/Auth'
+                        )
+                    ]
+                )
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
@@ -43,15 +49,10 @@ class LoginController extends Controller
      */
     public function __invoke(LoginUserData $data, LoginUserAction $action): JsonResponse
     {
-        [$user, $token] = $action->handle($data);
+        $authData = $action->handle($data);
 
-        $authData = new AuthData(
-            user: UserData::from($user),
-            accessToken: $token
-        );
-
-        return $authData
-            ->toResponse(request())
+        return AuthResource::make($authData)
+            ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 }

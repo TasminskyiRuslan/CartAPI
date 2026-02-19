@@ -20,7 +20,10 @@ describe('MeController', function () {
 
             getJson(route('auth.me'))
                 ->assertOk()
-                ->assertJsonStructure(userJsonStructure());
+                ->assertJsonPath('data.email', $user->email)
+                ->assertJsonStructure([
+                    'data' => userJsonStructure()
+                ]);
         });
     });
 

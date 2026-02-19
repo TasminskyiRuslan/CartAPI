@@ -36,7 +36,12 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Auth"
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Auth"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -84,7 +89,12 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/User"
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -124,7 +134,12 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Auth"
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Auth"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -253,18 +268,6 @@
                         "type": "string",
                         "format": "email",
                         "example": "john@example.com"
-                    },
-                    "created_at": {
-                        "description": "The user registered at",
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2026-01-01T12:00:00Z"
-                    },
-                    "updated_at": {
-                        "description": "The user last updated at",
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2026-01-10T12:00:00Z"
                     }
                 },
                 "type": "object"

@@ -1,11 +1,10 @@
 <?php
 
-use App\Data\Auth\Responses\UserData;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\LogoutController;
 use App\Http\Controllers\Api\Auth\MeController;
 use App\Http\Controllers\Api\Auth\RegisterController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\Cart\CartController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,4 +30,10 @@ Route::prefix('auth')->group(callback: function () {
     Route::delete('/logout', LogoutController::class)
         ->middleware('auth:sanctum')
         ->name('auth.logout');
+});
+
+Route::prefix('cart')->group(callback: function () {
+    // Me action
+    Route::get('/', [CartController::class, 'index'])
+        ->name('cart.index');
 });

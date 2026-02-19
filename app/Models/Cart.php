@@ -3,11 +3,35 @@
 namespace App\Models;
 
 use Database\Factories\CartFactory;
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property int|null $user_id
+ * @property string|null $guest_token
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection<int, CartItem> $items
+ * @property-read int|null $items_count
+ * @property-read User|null $user
+ * @method static CartFactory factory($count = null, $state = [])
+ * @method static Builder<static>|Cart newModelQuery()
+ * @method static Builder<static>|Cart newQuery()
+ * @method static Builder<static>|Cart query()
+ * @method static Builder<static>|Cart whereCreatedAt($value)
+ * @method static Builder<static>|Cart whereGuestToken($value)
+ * @method static Builder<static>|Cart whereId($value)
+ * @method static Builder<static>|Cart whereUpdatedAt($value)
+ * @method static Builder<static>|Cart whereUserId($value)
+ * @mixin Eloquent
+ */
 class Cart extends Model
 {
     /** @use HasFactory<CartFactory> */
