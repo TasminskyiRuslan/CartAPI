@@ -21,6 +21,7 @@ class CartFactory extends Factory
         return [
             'user_id' => User::factory(),
             'guest_token' => null,
+            'expires_at' => now()->addDays(config('cart.expiration_days.user')),
         ];
     }
 
@@ -34,6 +35,7 @@ class CartFactory extends Factory
         return $this->state(fn () => [
             'user_id' => null,
             'guest_token' => fake()->uuid(),
+            'expires_at' => now()->addDays(config('cart.expiration_days.guest')),
         ]);
     }
 }

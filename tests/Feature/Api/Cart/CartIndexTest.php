@@ -71,7 +71,7 @@ describe('CartController -> index', function () {
             $cart = Cart::factory()->create(['user_id' => null, 'guest_token' => Str::uuid()]);
             $items = CartItem::factory()->count(2)->for($cart)->create();
 
-            getJson(route('cart.index'), [config('cart.cart_guest_header') => $cart->guest_token])
+            getJson(route('cart.index'), [config('cart.guest_header') => $cart->guest_token])
                 ->assertOk()
                 ->assertJsonStructure([
                     'data' => cartJsonStructure(),
@@ -83,7 +83,7 @@ describe('CartController -> index', function () {
         it('returns empty items for guest user with empty cart', function () {
             $cart = Cart::factory()->create(['user_id' => null, 'guest_token' => Str::uuid()]);
 
-            getJson(route('cart.index'), [config('cart.cart_guest_header') => $cart->guest_token])
+            getJson(route('cart.index'), [config('cart.guest_header') => $cart->guest_token])
                 ->assertOk()
                 ->assertJsonStructure([
                     'data' => cartJsonStructure(),
@@ -101,6 +101,38 @@ describe('CartController -> index', function () {
                 ->assertJsonStructure([
                     'data' => cartJsonStructure(),
                 ])
+                ->assertJsonPath('data.id', null)
+                ->assertJsonPath('data.items', [])
+                ->assertJsonPath('data.total_items', 0)
+                ->assertJsonPath('data.total_price', '0.00');
+        });
+
+        it('does not return expired cart for authenticated user', function () {
+            $user = User::factory()->create();
+
+            $cart = Cart::factory()->for($user)->createQuietly([
+                'expires_at' => now()->subDay(),
+            ]);
+
+            Sanctum::actingAs($user);
+
+            getJson(route('cart.index'))
+                ->assertOk()
+                ->assertJsonPath('data.id', null)
+                ->assertJsonPath('data.items', [])
+                ->assertJsonPath('data.total_items', 0)
+                ->assertJsonPath('data.total_price', '0.00');
+        });
+
+        it('does not return expired cart for guest user', function () {
+            $cart = Cart::factory()->createQuietly([
+                'user_id' => null,
+                'guest_token' => Str::uuid(),
+                'expires_at' => now()->subDay(),
+            ]);
+
+            getJson(route('cart.index'), [config('cart.guest_header') => $cart->guest_token])
+                ->assertOk()
                 ->assertJsonPath('data.id', null)
                 ->assertJsonPath('data.items', [])
                 ->assertJsonPath('data.total_items', 0)

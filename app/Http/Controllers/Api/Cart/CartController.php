@@ -13,9 +13,9 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 class CartController extends Controller
 {
     /**
-     * CartController constructor.
+     * Create a new instance of CartController.
      *
-     * @param CartService $service The service responsible for handling cart operations. This service will be injected into the controller to manage cart-related functionality.
+     * @param CartService $service The service responsible for handling cart operations.
      */
     public function __construct(
         protected CartService $service
@@ -24,18 +24,14 @@ class CartController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
-     * @param Request $request The incoming HTTP request containing the authenticated user and guest token (if applicable).
-     * @return JsonResponse A JSON response containing the cart data for the authenticated user or guest. The response will have a status code of 200 (OK).
+     * Show the cart identified by the provided information in the request.
+     *
+     * @param Request $request The incoming HTTP request containing the necessary information to identify the cart.
+     * @return JsonResponse A JSON response containing the cart data, formatted using the CartResource, with an HTTP status code of 200 (OK).
      */
     public function index(Request $request): JsonResponse
     {
-        $owner = new CartIdentifierData(
-            $request->user(),
-            $request->header(config('cart.cart_guest_header'))
-        );
-
-        $cart = $this->service->getCart($owner);
+        $cart = $this->service->get(CartIdentifierData::fromRequest($request));
 
         return CartResource::make($cart)
             ->response()

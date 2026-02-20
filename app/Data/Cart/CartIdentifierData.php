@@ -3,6 +3,7 @@
 namespace App\Data\Cart;
 
 use App\Models\User;
+use Illuminate\Http\Request;
 use Spatie\LaravelData\Data;
 
 class CartIdentifierData extends Data
@@ -17,4 +18,18 @@ class CartIdentifierData extends Data
         public ?User $user,
         public ?string $guestToken,
     ) {}
+
+    /**
+     * Create a new instance of CartIdentifierData from an HTTP request.
+     *
+     * @param Request $request The incoming HTTP request containing the authenticated user and guest token (if applicable).
+     * @return self A new instance of CartIdentifierData populated with the user and guest token from the request.
+     */
+    public static function fromRequest(Request $request): self
+    {
+        return new self(
+            user: $request->user(),
+            guestToken: $request->header(config('cart.guest_header'))
+        );
+    }
 }
