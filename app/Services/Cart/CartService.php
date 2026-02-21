@@ -4,46 +4,79 @@ namespace App\Services\Cart;
 
 use App\Data\Cart\CartIdentifierData;
 use App\Models\Cart;
+use App\Models\User;
 use DB;
 use Throwable;
 
 class CartService
 {
     /**
-     * Retrieves an existing cart for the given identifier data or creates a new one if it doesn't exist.
+     * Find an active cart for the given guest token.
      *
-     * @param CartIdentifierData $data The data used to identify the cart, which may include user information and guest token.
-     * @return Cart|null The retrieved or newly created cart instance.
+     * @param string $guestToken The guest token for which to find the cart.
+     * @return Cart|null The found cart instance if it exists and is active; otherwise, null.
      */
-    public function get(CartIdentifierData $data): ?Cart
+    public function findForGuestToken(string $guestToken): ?Cart
     {
-        return Cart::forOwner($data)->active()->with('items.product')->first();
+        return Cart::forGuest($guestToken)->active()->first();
     }
 
     /**
-     * Retrieves an existing cart for the given identifier data or creates a new one if it doesn't exist. If the cart is expired, it will be cleared and extended.
+     * Find an active cart for the given user.
      *
-     * @param CartIdentifierData $data The data used to identify the cart, which may include user information and guest token.
-     * @throws Throwable If there is an error during the database transaction.
-     * @return Cart The retrieved or newly created cart instance, with items and products loaded.
+     * @param User $user The user for whom to find the cart.
+     * @return Cart|null The found cart instance if it exists and is active; otherwise, null.
      */
-    public function getOrCreate(CartIdentifierData $data): Cart
+    public function findForUser(User $user): ?Cart
+    {
+        return Cart::forUser($user)->active()->first();
+    }
+
+    /**
+     * Find an active cart for the given identifier data, which may include user information or a guest token.
+     *
+     * @param CartIdentifierData $data The data used to identify the cart, which may include user information or a guest token.
+     * @return Cart|null The found cart instance if it exists and is active; otherwise, null.
+     */
+    public function find(CartIdentifierData $data): ?Cart
+    {
+        return Cart::forOwner($data)->active()->first();
+    }
+
+    /**
+     * Create a new cart based on the provided identifier data.
+     *
+     * @param CartIdentifierData $data The data used to create the cart, which may include user information or a guest token.
+     * @return Cart The newly created cart instance.
+     */
+    public function create(CartIdentifierData $data): Cart
+    {
+        return Cart::create([
+            'user_id' => $data->user?->id,
+            'guest_token' => $data->user?->id ? null : $data->guestToken,
+        ]);
+    }
+
+    /**
+     * Find an existing cart for the given identifier data or create a new one if it doesn't exist or is expired.
+     *
+     * @param CartIdentifierData $data The data used to identify the cart, which may include user information or a guest token.
+     * @return Cart The found or newly created cart instance.
+     * @throws Throwable If any error occurs during the database transaction.
+     */
+    public function findOrCreate(CartIdentifierData $data): Cart
     {
         return DB::transaction(function () use ($data) {
             $cart = Cart::forOwner($data)->first();
 
             if (!$cart) {
-                $cart = Cart::create([
-                    'user_id' => $data->user?->id,
-                    'guest_token' => $data->user ? null : $data->guestToken,
-                ]);
+                $cart = $this->create($data);
             } elseif ($cart->isExpired()) {
-                $cart->clear();
+                $cart->delete();
+                $cart = $this->create($data);
             }
 
-            $cart->extendExpiration();
-
-            return $cart->loadMissing('items.product');
+            return $cart;
         });
     }
 }

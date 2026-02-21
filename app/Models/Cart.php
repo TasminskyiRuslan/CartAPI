@@ -33,6 +33,9 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|Cart whereUpdatedAt($value)
  * @method static Builder<static>|Cart whereUserId($value)
  * @method static notExpired()
+ * @method static forUser(User $user)
+ * @method static forGuest(string $guestToken)
+ * @method static forOwner(CartIdentifierData $data)
  * @mixin Eloquent
  */
 class Cart extends Model
@@ -107,6 +110,30 @@ class Cart extends Model
     }
 
     /**
+     * Scope a query to find a cart for the given guest token.
+     *
+     * @param Builder $query The query builder instance to modify.
+     * @param string $guestToken The guest token to filter the carts by.
+     * @return Builder The modified query builder instance with the guest cart scope applied.
+     */
+    public function scopeForGuest(Builder $query, string $guestToken): Builder
+    {
+        return $query->where('guest_token', $guestToken);
+    }
+
+    /**
+     * Scope a query to find a cart for the given user.
+     *
+     * @param Builder $query The query builder instance to modify.
+     * @param User $user The user for whom to find the cart.
+     * @return Builder The modified query builder instance with the user cart scope applied.
+     */
+    public function scopeForUser(Builder $query, User $user): Builder
+    {
+        return $query->where('user_id', $user->id);
+    }
+
+    /**
      * Scope a query to only include carts that belong to the specified owner, which can be either an authenticated user or a guest identified by a token.
      *
      * @param Builder $query The query builder instance to modify.
@@ -115,11 +142,11 @@ class Cart extends Model
      */
     public function scopeForOwner(Builder $query, CartIdentifierData $data): Builder
     {
-        if ($data->user) {
-            return $query->where('user_id', $data->user?->id);
-        }
-
-        return $query->where('guest_token', $data->guestToken)->whereNull('user_id');
+        return $query->when(
+            $data->user,
+            fn (Builder $q) => $q->where('user_id', $data->user->id),
+            fn (Builder $q) => $q->where('guest_token', $data->guestToken)->whereNull('user_id')
+        );
     }
 
     /**
@@ -148,7 +175,7 @@ class Cart extends Model
      *
      * @return void
      */
-    public function extendExpiration(): void
+    public function refreshExpiration(): void
     {
         $days = $this->user_id
             ? config('cart.expiration_days.user')
@@ -156,16 +183,6 @@ class Cart extends Model
 
         $this->expires_at = now()->addDays($days);
         $this->save();
-    }
-
-    /**
-     * Clear the cart by deleting all associated cart items. This method is typically used when a cart is expired or when the user wants to empty their cart.
-     *
-     * @return void
-     */
-    public function clear(): void
-    {
-        $this->items()->delete();
     }
 
     /**

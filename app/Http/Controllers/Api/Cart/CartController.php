@@ -31,9 +31,9 @@ class CartController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $cart = $this->service->get(CartIdentifierData::fromRequest($request));
+        $cart = $this->service->find(CartIdentifierData::fromRequest($request));
 
-        return CartResource::make($cart)
+        return CartResource::make($cart?->loadMissing('items.product'))
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }

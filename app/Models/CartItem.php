@@ -64,6 +64,21 @@ class CartItem extends Model
     }
 
     /**
+     * Refresh the expiration time of the associated cart whenever a cart item is saved or deleted.
+     *
+     * @return void
+     */
+    protected static function booted(): void
+    {
+        static::saved(function (CartItem $item) {
+            $item->cart->refreshExpiration();
+        });
+
+        static::deleted(function (CartItem $item) {
+            $item->cart->refreshExpiration();
+        });
+    }
+    /**
      * Get the product that owns the cart item.
      *
      * @return BelongsTo<Product, CartItem>
