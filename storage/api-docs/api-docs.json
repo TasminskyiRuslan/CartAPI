@@ -149,6 +149,42 @@
                     }
                 }
             }
+        },
+        "/cart": {
+            "get": {
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Get current cart",
+                "description": "Get the current cart for the user..",
+                "operationId": "8f16b385b0bec46faad2136254a7ef52",
+                "responses": {
+                    "200": {
+                        "description": "The cart data returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Cart"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    },
+                    {
+                        "guest_token": []
+                    },
+                    {}
+                ]
+            }
         }
     },
     "components": {
@@ -271,6 +307,122 @@
                     }
                 },
                 "type": "object"
+            },
+            "CartItem": {
+                "title": "Cart Item Schema",
+                "description": "Details of a cart item returned by the API",
+                "required": [
+                    "id",
+                    "price_snapshot",
+                    "quantity",
+                    "total_price",
+                    "product"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "The product ID",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "price_snapshot": {
+                        "description": "The product price at the time it was added to the cart",
+                        "type": "string",
+                        "format": "float",
+                        "example": 999.99
+                    },
+                    "quantity": {
+                        "description": "The quantity of the product in the cart",
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "total_price": {
+                        "description": "The total price for this cart item (price_snapshot * quantity)",
+                        "type": "string",
+                        "format": "float",
+                        "example": 1999.98
+                    },
+                    "product": {
+                        "$ref": "#/components/schemas/Product"
+                    }
+                },
+                "type": "object"
+            },
+            "Cart": {
+                "title": "Cart schema",
+                "description": "The cart data returned by the API",
+                "required": [
+                    "id",
+                    "items",
+                    "total_price",
+                    "total_count"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "The cart ID",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "items": {
+                        "description": "The cart items",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CartItem"
+                        }
+                    },
+                    "total_price": {
+                        "description": "The total price of the cart",
+                        "type": "string",
+                        "format": "float",
+                        "example": 1999.98
+                    },
+                    "total_count": {
+                        "description": "The total count of the cart",
+                        "type": "integer",
+                        "example": 2
+                    }
+                },
+                "type": "object"
+            },
+            "Product": {
+                "title": "Product Schema",
+                "description": "Details of a product returned by the API",
+                "required": [
+                    "id",
+                    "name",
+                    "price"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "The product ID",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "The product name",
+                        "type": "string",
+                        "example": "iPhone 15 Pro"
+                    },
+                    "description": {
+                        "description": "The product description",
+                        "type": "string",
+                        "example": "New iPhone with powerful processor and Pro camera",
+                        "nullable": true
+                    },
+                    "price": {
+                        "description": "The product price",
+                        "type": "string",
+                        "format": "float",
+                        "example": 999.99
+                    },
+                    "image_path": {
+                        "description": "The image of the product",
+                        "type": "string",
+                        "format": "path",
+                        "example": "products/product1.png",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
@@ -281,6 +433,12 @@
                 "in": "header",
                 "bearerFormat": "JWT",
                 "scheme": "bearer"
+            },
+            "guest_token": {
+                "type": "apiKey",
+                "description": "Token for guest cart identification generated by frontend",
+                "name": "X-Guest-Token",
+                "in": "header"
             }
         }
     },
@@ -288,6 +446,10 @@
         {
             "name": "Auth",
             "description": "Auth"
+        },
+        {
+            "name": "Cart",
+            "description": "Cart"
         }
     ]
 }

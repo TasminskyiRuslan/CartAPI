@@ -9,6 +9,7 @@ use App\Services\Cart\CartService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use OpenApi\Attributes as OA;
 
 class CartController extends Controller
 {
@@ -23,6 +24,27 @@ class CartController extends Controller
     {
     }
 
+    #[OA\Get(
+        path: '/cart',
+        description: 'Get the current cart for the user..',
+        summary: 'Get current cart',
+        security: [['sanctum' => []], ['guest_token' => []], []],
+        tags: ['Cart'],
+        responses: [
+            new OA\Response(
+                response: SymfonyResponse::HTTP_OK,
+                description: 'The cart data returned.',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            ref: '#/components/schemas/Cart'
+                        )
+                    ]
+                )
+            ),
+        ]
+    )]
     /**
      * Show the cart identified by the provided information in the request.
      *
