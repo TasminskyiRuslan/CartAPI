@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Auth\LogoutController;
 use App\Http\Controllers\Api\Auth\MeController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Cart\CartController;
+use App\Http\Controllers\Api\Cart\CartItemController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,4 +41,10 @@ Route::prefix('cart')->group(callback: function () {
     // Cart destroy action
     Route::delete('/', [CartController::class, 'destroy'])
         ->name('cart.destroy');
+
+    Route::prefix('item')->group(callback: function () {
+        // Cart item destroy action
+        Route::post('/', [CartItemController::class, 'store'])
+            ->name('cart.item.store');
+    });
 })->scopeBindings();

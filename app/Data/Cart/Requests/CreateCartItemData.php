@@ -26,6 +26,6 @@ class CreateCartItemData extends Data
 
         #[IntegerType]
         #[Min(1)]
-        public int $quantity,
+        public int $quantity = 1,
     ) {}
 }

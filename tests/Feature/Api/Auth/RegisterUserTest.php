@@ -73,7 +73,7 @@ describe('RegisterController', function () {
                     'data' => authJsonStructure()
                 ]);
 
-            $user = User::where('email', $data['email'])->first();
+            $user = User::whereEmail($data['email'])->first();
 
             expect($user)->not->toBeNull()
                 ->and(Hash::check($data['password'], $user->password))->toBeTrue();

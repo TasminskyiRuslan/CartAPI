@@ -111,4 +111,11 @@ class CartItem extends Model
             2
         );
     }
+
+    public function addQuantity(int $quantity): CartItem
+    {
+        $this->quantity += $quantity;
+        $this->save();
+        return $this;
+    }
 }
