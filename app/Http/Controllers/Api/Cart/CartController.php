@@ -27,7 +27,7 @@ class CartController extends Controller
 
     #[OA\Get(
         path: '/cart',
-        description: 'Get the current cart for the user..',
+        description: 'Get the current cart for the user.',
         summary: 'Get current cart',
         security: [['sanctum' => []], ['guest_token' => []], []],
         tags: ['Cart'],
@@ -61,6 +61,19 @@ class CartController extends Controller
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 
+    #[OA\Delete(
+        path: '/cart',
+        description: 'Delete the current cart for the user.',
+        summary: 'Delete current cart',
+        security: [['sanctum' => []], ['guest_token' => []], []],
+        tags: ['Cart'],
+        responses: [
+            new OA\Response(
+                response: SymfonyResponse::HTTP_NO_CONTENT,
+                description: 'The cart deleted.'
+            )
+        ]
+    )]
     /**
      * Delete the cart identified by the provided information in the request.
      *

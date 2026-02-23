@@ -156,7 +156,7 @@
                     "Cart"
                 ],
                 "summary": "Get current cart",
-                "description": "Get the current cart for the user..",
+                "description": "Get the current cart for the user.",
                 "operationId": "8f16b385b0bec46faad2136254a7ef52",
                 "responses": {
                     "200": {
@@ -173,6 +173,28 @@
                                 }
                             }
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    },
+                    {
+                        "guest_token": []
+                    },
+                    {}
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Delete current cart",
+                "description": "Delete the current cart for the user.",
+                "operationId": "87ae7ca34713e7228f1422e3cafa31c5",
+                "responses": {
+                    "204": {
+                        "description": "The cart deleted."
                     }
                 },
                 "security": [
