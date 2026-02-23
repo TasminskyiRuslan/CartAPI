@@ -7,12 +7,12 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'LoginUserRequest',
     title: 'Login User Request Schema',
-    description: 'Schema for user login via API request',
+    description: 'Schema for user login via API request.',
     required: ['email', 'password'],
     properties: [
         new OA\Property(
             property: 'email',
-            description: 'Email of the user',
+            description: 'Email of the user.',
             type: 'string',
             format: 'email',
             maxLength: 255,
@@ -20,7 +20,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'password',
-            description: 'Password of the user',
+            description: 'Password of the user.',
             type: 'string',
             format: 'password',
             example: 'password123'

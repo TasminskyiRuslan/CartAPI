@@ -32,7 +32,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "User logged in",
+                        "description": "User logged in.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -47,7 +47,7 @@
                         }
                     },
                     "422": {
-                        "description": "Validation error"
+                        "description": "Validation error."
                     }
                 }
             }
@@ -62,10 +62,10 @@
                 "operationId": "23a3ec5e2e8d20c9fd2ea568ae96fcd3",
                 "responses": {
                     "204": {
-                        "description": "User logged out"
+                        "description": "User logged out."
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthorized."
                     }
                 },
                 "security": [
@@ -85,7 +85,7 @@
                 "operationId": "a27984a716a6787c8b8537aee958673c",
                 "responses": {
                     "200": {
-                        "description": "Authenticated user data",
+                        "description": "Authenticated user data.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -100,7 +100,7 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthorized."
                     }
                 },
                 "security": [
@@ -130,7 +130,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "User registered",
+                        "description": "User registered.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -145,7 +145,7 @@
                         }
                     },
                     "422": {
-                        "description": "Validation error"
+                        "description": "Validation error."
                     }
                 }
             }
@@ -207,27 +207,91 @@
                     {}
                 ]
             }
+        },
+        "/cart/items": {
+            "post": {
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Add or update cart item",
+                "description": "Adds a product to the cart.",
+                "operationId": "d6674e21902278d2c2b278acd30ccb91",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateItemRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Cart item created.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Cart"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Cart item quantity updated.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Cart"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    },
+                    {
+                        "guest_token": []
+                    },
+                    {}
+                ]
+            }
         }
     },
     "components": {
         "schemas": {
             "LoginUserRequest": {
                 "title": "Login User Request Schema",
-                "description": "Schema for user login via API request",
+                "description": "Schema for user login via API request.",
                 "required": [
                     "email",
                     "password"
                 ],
                 "properties": {
                     "email": {
-                        "description": "Email of the user",
+                        "description": "Email of the user.",
                         "type": "string",
                         "format": "email",
                         "maxLength": 255,
                         "example": "john@example.com"
                     },
                     "password": {
-                        "description": "Password of the user",
+                        "description": "Password of the user.",
                         "type": "string",
                         "format": "password",
                         "example": "password123"
@@ -237,7 +301,7 @@
             },
             "RegisterUserRequest": {
                 "title": "Register User Request Schema",
-                "description": "Schema for user registration via API request",
+                "description": "Schema for user registration via API request.",
                 "required": [
                     "name",
                     "email",
@@ -246,27 +310,27 @@
                 ],
                 "properties": {
                     "name": {
-                        "description": "Name of the user",
+                        "description": "Name of the user.",
                         "type": "string",
                         "maxLength": 100,
                         "example": "John Doe"
                     },
                     "email": {
-                        "description": "Email of the user",
+                        "description": "Email of the user.",
                         "type": "string",
                         "format": "email",
                         "maxLength": 255,
                         "example": "john@example.com"
                     },
                     "password": {
-                        "description": "Password of the user",
+                        "description": "Password of the user.",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
                         "example": "password123"
                     },
                     "password_confirmation": {
-                        "description": "Password Confirmation of the user",
+                        "description": "Password Confirmation of the user.",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
@@ -275,9 +339,30 @@
                 },
                 "type": "object"
             },
+            "CreateItemRequest": {
+                "title": "Create Item Request Schema",
+                "description": "Schema for cart item creation via API request.",
+                "required": [
+                    "product_id"
+                ],
+                "properties": {
+                    "product_id": {
+                        "description": "The product ID.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "quantity": {
+                        "description": "The product quantity.",
+                        "type": "integer",
+                        "minimum": 1,
+                        "example": 2
+                    }
+                },
+                "type": "object"
+            },
             "Auth": {
                 "title": "Auth Schema",
-                "description": "Authentication data returned by the API",
+                "description": "Authentication data returned by the API.",
                 "required": [
                     "user",
                     "access_token",
@@ -288,12 +373,12 @@
                         "$ref": "#/components/schemas/User"
                     },
                     "access_token": {
-                        "description": "Access token",
+                        "description": "Access token.",
                         "type": "string",
                         "example": "1|eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
                     },
                     "token_type": {
-                        "description": "Type of the token for Authorization header",
+                        "description": "Type of the token for Authorization header.",
                         "type": "string",
                         "example": "Bearer"
                     }
@@ -302,27 +387,25 @@
             },
             "User": {
                 "title": "User Schema",
-                "description": "User data returned by the API",
+                "description": "User data returned by the API.",
                 "required": [
                     "id",
                     "name",
-                    "email",
-                    "created_at",
-                    "updated_at"
+                    "email"
                 ],
                 "properties": {
                     "id": {
-                        "description": "The user ID",
+                        "description": "The user ID.",
                         "type": "integer",
                         "example": 1
                     },
                     "name": {
-                        "description": "The user name",
+                        "description": "The user name.",
                         "type": "string",
                         "example": "John Doe"
                     },
                     "email": {
-                        "description": "The user email",
+                        "description": "The user email.",
                         "type": "string",
                         "format": "email",
                         "example": "john@example.com"
@@ -332,7 +415,7 @@
             },
             "CartItem": {
                 "title": "Cart Item Schema",
-                "description": "Details of a cart item returned by the API",
+                "description": "Details of a cart item returned by the API.",
                 "required": [
                     "id",
                     "price_snapshot",
@@ -342,23 +425,23 @@
                 ],
                 "properties": {
                     "id": {
-                        "description": "The product ID",
+                        "description": "The product ID.",
                         "type": "integer",
                         "example": 1
                     },
                     "price_snapshot": {
-                        "description": "The product price at the time it was added to the cart",
+                        "description": "The product price at the time it was added to the cart.",
                         "type": "string",
                         "format": "float",
                         "example": 999.99
                     },
                     "quantity": {
-                        "description": "The quantity of the product in the cart",
+                        "description": "The quantity of the product in the cart.",
                         "type": "integer",
                         "example": 2
                     },
                     "total_price": {
-                        "description": "The total price for this cart item (price_snapshot * quantity)",
+                        "description": "The total price for this cart item (price_snapshot * quantity).",
                         "type": "string",
                         "format": "float",
                         "example": 1999.98
@@ -371,7 +454,7 @@
             },
             "Cart": {
                 "title": "Cart schema",
-                "description": "The cart data returned by the API",
+                "description": "The cart data returned by the API.",
                 "required": [
                     "id",
                     "items",
@@ -380,25 +463,25 @@
                 ],
                 "properties": {
                     "id": {
-                        "description": "The cart ID",
+                        "description": "The cart ID.",
                         "type": "integer",
                         "example": 1
                     },
                     "items": {
-                        "description": "The cart items",
+                        "description": "The cart items.",
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/CartItem"
                         }
                     },
                     "total_price": {
-                        "description": "The total price of the cart",
+                        "description": "The total price of the cart.",
                         "type": "string",
                         "format": "float",
                         "example": 1999.98
                     },
                     "total_count": {
-                        "description": "The total count of the cart",
+                        "description": "The total count of the cart.",
                         "type": "integer",
                         "example": 2
                     }
@@ -407,7 +490,7 @@
             },
             "Product": {
                 "title": "Product Schema",
-                "description": "Details of a product returned by the API",
+                "description": "Details of a product returned by the API.",
                 "required": [
                     "id",
                     "name",
@@ -415,29 +498,29 @@
                 ],
                 "properties": {
                     "id": {
-                        "description": "The product ID",
+                        "description": "The product ID.",
                         "type": "integer",
                         "example": 1
                     },
                     "name": {
-                        "description": "The product name",
+                        "description": "The product name.",
                         "type": "string",
                         "example": "iPhone 15 Pro"
                     },
                     "description": {
-                        "description": "The product description",
+                        "description": "The product description.",
                         "type": "string",
                         "example": "New iPhone with powerful processor and Pro camera",
                         "nullable": true
                     },
                     "price": {
-                        "description": "The product price",
+                        "description": "The product price.",
                         "type": "string",
                         "format": "float",
                         "example": 999.99
                     },
                     "image_path": {
-                        "description": "The image of the product",
+                        "description": "The image of the product.",
                         "type": "string",
                         "format": "path",
                         "example": "products/product1.png",

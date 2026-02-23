@@ -20,7 +20,7 @@ class MeController extends Controller
         responses: [
             new OA\Response(
                 response: SymfonyResponse::HTTP_OK,
-                description: 'Authenticated user data',
+                description: 'Authenticated user data.',
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(
@@ -32,7 +32,7 @@ class MeController extends Controller
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNAUTHORIZED,
-                description: 'Unauthorized'
+                description: 'Unauthorized.'
             )
         ]
     )]

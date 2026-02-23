@@ -20,11 +20,11 @@ class LogoutController extends Controller
         responses: [
             new OA\Response(
                 response: SymfonyResponse::HTTP_NO_CONTENT,
-                description: 'User logged out'
+                description: 'User logged out.'
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNAUTHORIZED,
-                description: 'Unauthorized'
+                description: 'Unauthorized.'
             )
         ]
     )]

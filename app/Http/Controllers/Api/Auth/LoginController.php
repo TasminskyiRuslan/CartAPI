@@ -24,7 +24,7 @@ class LoginController extends Controller
         responses: [
             new OA\Response(
                 response: SymfonyResponse::HTTP_OK,
-                description: 'User logged in',
+                description: 'User logged in.',
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(
@@ -36,7 +36,7 @@ class LoginController extends Controller
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
-                description: 'Validation error'
+                description: 'Validation error.'
             ),
         ]
     )]

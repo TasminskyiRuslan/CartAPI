@@ -42,7 +42,7 @@ Route::prefix('cart')->group(callback: function () {
     Route::delete('/', [CartController::class, 'destroy'])
         ->name('cart.destroy');
 
-    Route::prefix('item')->group(callback: function () {
+    Route::prefix('items')->group(callback: function () {
         // Cart item destroy action
         Route::post('/', [CartItemController::class, 'store'])
             ->name('cart.item.store');

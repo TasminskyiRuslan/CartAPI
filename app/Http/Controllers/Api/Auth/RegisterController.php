@@ -25,7 +25,7 @@ class RegisterController extends Controller
         responses: [
             new OA\Response(
                 response: SymfonyResponse::HTTP_CREATED,
-                description: 'User registered',
+                description: 'User registered.',
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(
@@ -37,7 +37,7 @@ class RegisterController extends Controller
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
-                description: 'Validation error'
+                description: 'Validation error.'
             ),
         ]
     )]
