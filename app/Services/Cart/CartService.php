@@ -16,7 +16,7 @@ class CartService
      * @param string $guestToken The guest token for which to find the cart.
      * @return Cart|null The found cart instance if it exists and is active; otherwise, null.
      */
-    public function findForGuestToken(string $guestToken): ?Cart
+    public function findForGuest(string $guestToken): ?Cart
     {
         return Cart::forGuest($guestToken)->active()->first();
     }
@@ -78,5 +78,38 @@ class CartService
 
             return $cart;
         });
+    }
+
+    /**
+     * Delete the cart for the given guest token if it exists.
+     *
+     * @param string $guestToken The guest token used to identify the cart to be deleted.
+     * @return void
+     */
+    public function deleteForGuest(string $guestToken): void
+    {
+        $this->findForGuest($guestToken)?->delete();
+    }
+
+    /**
+     * Delete the cart for the given user if it exists.
+     *
+     * @param User $user The user for whom to delete the cart.
+     * @return void
+     */
+    public function deleteForUser(User $user): void
+    {
+        $this->findForUser($user)?->delete();
+    }
+
+    /**
+     * Delete the cart identified by the provided identifier data if it exists.
+     *
+     * @param CartIdentifierData $data The data used to identify the cart to be deleted, which may include user information or a guest token.
+     * @return void
+     */
+    public function delete(CartIdentifierData $data): void
+    {
+        $this->find($data)?->delete();
     }
 }

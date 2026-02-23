@@ -33,7 +33,11 @@ Route::prefix('auth')->group(callback: function () {
 });
 
 Route::prefix('cart')->group(callback: function () {
-    // Me action
+    // Cart index action
     Route::get('/', [CartController::class, 'index'])
         ->name('cart.index');
-});
+
+    // Cart destroy action
+    Route::delete('/', [CartController::class, 'destroy'])
+        ->name('cart.destroy');
+})->scopeBindings();

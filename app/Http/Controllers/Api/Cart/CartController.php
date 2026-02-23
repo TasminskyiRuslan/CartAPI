@@ -8,6 +8,7 @@ use App\Http\Resources\Cart\CartResource;
 use App\Services\Cart\CartService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use OpenApi\Attributes as OA;
 
@@ -61,10 +62,14 @@ class CartController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete the cart identified by the provided information in the request.
+     *
+     * @param Request $request The incoming HTTP request containing the necessary information to identify the cart.
+     * @return Response A response with an HTTP status code of 204 (No Content) indicating successful deletion.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request): Response
     {
-        //
+        $this->service->delete(CartIdentifierData::fromRequest($request));
+        return response()->noContent();
     }
 }
