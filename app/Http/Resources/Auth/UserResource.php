@@ -6,9 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property-read int $id Unique identifier for the user.
- * @property-read string $name Name of the user.
- * @property-read string $email Email address of the user.
+ * @property-read int $id
+ * @property-read string $name
+ * @property-read string $email
  */
 class UserResource extends JsonResource
 {

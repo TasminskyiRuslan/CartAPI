@@ -7,9 +7,9 @@ use App\Models\User;
 class LogoutUserAction
 {
     /**
-     * Handle the logout process for the given user.
+     * Revoke the current access token.
      *
-     * @param User $user The user to be logged out.
+     * @param User $user
      * @return void
      */
     public function handle(User $user): void

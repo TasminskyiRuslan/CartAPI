@@ -8,11 +8,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property-read int $id Unique identifier for the cart item.
- * @property-read array $price_snapshot Snapshot of the product's price at the time it was added to the cart, including details such as base price, discounts, and taxes.
- * @property-read int $quantity The quantity of the product added to the cart.
- * @method string calculateTotalPrice() Calculate the total price for this cart item by multiplying the quantity with the price from the price snapshot, providing a clear view of the cost for this specific item in the cart.
- * @property-read Product|null $product The product associated with the cart item, providing access to its details such as name, description, and current price.
+ * @property-read int $id
+ * @property-read string $price_snapshot
+ * @property-read int $quantity
+ * @property-read Product|null $product
+ * @method string calculateTotalPrice()
  */
 class CartItemResource extends JsonResource
 {

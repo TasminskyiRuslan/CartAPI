@@ -11,9 +11,7 @@ use Illuminate\Validation\ValidationException;
 class LoginUserAction
 {
     /**
-     * Create a new instance of LoginUserAction.
-     *
-     * @param IssueTokenAction $issueTokenAction The action to handle token issuance.
+     * @param IssueTokenAction $issueTokenAction
      */
     public function __construct(
         protected IssueTokenAction $issueTokenAction,
@@ -22,11 +20,11 @@ class LoginUserAction
     }
 
     /**
-     * Handle the user login process.
+     * Authenticate user and issue token.
      *
-     * @param LoginUserData $data The data for logging in a user.
-     * @throws ValidationException If the provided credentials are invalid.
-     * @return AuthData An array containing the authenticated user and the issued token.
+     * @param LoginUserData $data
+     * @return AuthData
+     * @throws ValidationException
      */
     public function handle(LoginUserData $data): AuthData
     {

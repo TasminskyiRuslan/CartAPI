@@ -15,7 +15,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $name
  * @property string|null $description
- * @property numeric $price
+ * @property string $price
  * @property string|null $image_path
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -64,7 +64,7 @@ class Product extends Model
     }
 
     /**
-     * Get the cart items for the product.
+     * Get the cart items associated with the product.
      *
      * @return HasMany<CartItem>
      */

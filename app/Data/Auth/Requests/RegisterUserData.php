@@ -16,11 +16,9 @@ use Spatie\LaravelData\Data;
 class RegisterUserData extends Data
 {
     /**
-     * Create a new instance of RegisterUserData.
-     *
-     * @param string $name The name of the user to register.
-     * @param string $email The email address of the user to register.
-     * @param string $password The password for the user to register.
+     * @param string $name
+     * @param string $email
+     * @param string $password
      */
     public function __construct(
         #[Required]

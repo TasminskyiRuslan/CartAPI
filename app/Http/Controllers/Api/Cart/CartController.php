@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Api\Cart;
 
+use App\Actions\Cart\DeleteCartAction;
+use App\Actions\Cart\FindCartAction;
 use App\Data\Cart\CartIdentifierData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Cart\CartResource;
-use App\Services\Cart\CartService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -14,17 +15,6 @@ use OpenApi\Attributes as OA;
 
 class CartController extends Controller
 {
-    /**
-     * Create a new instance of CartController.
-     *
-     * @param CartService $service The service responsible for handling cart operations.
-     */
-    public function __construct(
-        protected CartService $service
-    )
-    {
-    }
-
     #[OA\Get(
         path: '/cart',
         description: 'Get the current cart for the user.',
@@ -47,14 +37,15 @@ class CartController extends Controller
         ]
     )]
     /**
-     * Show the cart identified by the provided information in the request.
+     * Get the current cart.
      *
-     * @param Request $request The incoming HTTP request containing the necessary information to identify the cart.
-     * @return JsonResponse A JSON response containing the cart data, formatted using the CartResource, with an HTTP status code of 200 (OK).
+     * @param Request $request
+     * @param FindCartAction $findCartAction
+     * @return JsonResponse
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request, FindCartAction $findCartAction): JsonResponse
     {
-        $cart = $this->service->find(CartIdentifierData::fromRequest($request));
+        $cart = $findCartAction->handle(CartIdentifierData::fromRequest($request));
 
         return CartResource::make($cart?->loadMissing('items.product'))
             ->response()
@@ -75,14 +66,15 @@ class CartController extends Controller
         ]
     )]
     /**
-     * Delete the cart identified by the provided information in the request.
+     * Delete the current cart.
      *
-     * @param Request $request The incoming HTTP request containing the necessary information to identify the cart.
-     * @return Response A response with an HTTP status code of 204 (No Content) indicating successful deletion.
+     * @param Request $request
+     * @param DeleteCartAction $deleteCartAction
+     * @return Response
      */
-    public function destroy(Request $request): Response
+    public function destroy(Request $request, DeleteCartAction $deleteCartAction): Response
     {
-        $this->service->delete(CartIdentifierData::fromRequest($request));
+        $deleteCartAction->handle(CartIdentifierData::fromRequest($request));
         return response()->noContent();
     }
 }

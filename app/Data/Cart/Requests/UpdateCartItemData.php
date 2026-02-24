@@ -10,9 +10,7 @@ use Spatie\LaravelData\Data;
 class UpdateCartItemData extends Data
 {
     /**
-     * Create a new instance of UpdateCartItemData.
-     *
-     * @param int $quantity The new quantity for the cart item. Must be at least 1.
+     * @param int $quantity
      */
     public function __construct(
         #[Required]

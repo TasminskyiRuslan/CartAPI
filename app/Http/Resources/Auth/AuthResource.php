@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property-read User $user User associated with the authentication resource.
- * @property-read string $token Access token for the authenticated user.
- * @property-read string|null $tokenType Optional token type, defaults to 'Bearer' if not provided.
+ * @property-read User $user
+ * @property-read string $token
+ * @property-read string|null $tokenType
  */
 class AuthResource extends JsonResource
 {

@@ -12,10 +12,8 @@ use Spatie\LaravelData\Data;
 class CreateCartItemData extends Data
 {
     /**
-     * Create a new instance of CreateCartItemData.
-     *
-     * @param int $productId The unique identifier of the product to be added to the cart.
-     * @param int $quantity The quantity of the product to be added to the cart. Must be at least 1.
+     * @param int $productId
+     * @param int $quantity
      */
     public function __construct(
         #[Required]

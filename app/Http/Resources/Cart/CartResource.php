@@ -7,10 +7,10 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
 
 /**
- * @property-read int|null $id Unique identifier for the cart.
- * @property-read Collection|CartItemResource[] $items Collection of items in the cart, loaded when requested.
- * @method int calculateTotalItems() Calculate the total number of items in the cart by summing the quantities of all cart items, providing a clear view of the total item count in the cart.
- * @method string calculateTotalPrice() Calculate the total price of the cart by summing the total price of each cart item, providing a clear view of the overall cost of the items in the cart.
+ * @property-read int|null $id
+ * @property-read Collection|CartItemResource[] $items
+ * @method int calculateTotalItems()
+ * @method string calculateTotalPrice()
  */
 class CartResource extends JsonResource
 {

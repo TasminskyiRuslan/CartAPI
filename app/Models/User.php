@@ -84,7 +84,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the cart associated with the user.
+     * Get the personal cart associated with the user.
      *
      * @return HasOne<Cart>
      */

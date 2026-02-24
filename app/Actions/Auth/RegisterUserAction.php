@@ -11,9 +11,7 @@ use Throwable;
 class RegisterUserAction
 {
     /**
-     * Register a new user and issue an authentication token.
-     *
-     * @param IssueTokenAction $issueTokenAction The action to handle token issuance.
+     * @param IssueTokenAction $issueTokenAction
      */
     public function __construct(
         protected IssueTokenAction $issueTokenAction,

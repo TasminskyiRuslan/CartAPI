@@ -14,7 +14,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property int $cart_id
  * @property int $product_id
- * @property numeric $price_snapshot
+ * @property string $price_snapshot
  * @property int $quantity
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -51,6 +51,13 @@ class CartItem extends Model
     ];
 
     /**
+     * The relationships that should be touched on save.
+     *
+     * @var list<string>
+     */
+    protected $touches = ['cart'];
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -64,22 +71,7 @@ class CartItem extends Model
     }
 
     /**
-     * Refresh the expiration time of the associated cart whenever a cart item is saved or deleted.
-     *
-     * @return void
-     */
-    protected static function booted(): void
-    {
-        static::saved(function (CartItem $item) {
-            $item->cart->refreshExpiration();
-        });
-
-        static::deleted(function (CartItem $item) {
-            $item->cart->refreshExpiration();
-        });
-    }
-    /**
-     * Get the product that owns the cart item.
+     * Get the product associated with the cart item.
      *
      * @return BelongsTo<Product, CartItem>
      */
@@ -89,7 +81,7 @@ class CartItem extends Model
     }
 
     /**
-     * Get the cart that owns the cart item.
+     * Get the cart that owns the item.
      *
      * @return BelongsTo<Cart, CartItem>
      */
@@ -99,9 +91,9 @@ class CartItem extends Model
     }
 
     /**
-     * Calculate the total price for the cart item based on the price snapshot and quantity.
+     * Calculate the total price for this item (price * quantity).
      *
-     * @return string The total price for the cart item, formatted as a decimal string with 2 decimal places.
+     * @return string Decimal string with 2 decimal places.
      */
     public function calculateTotalPrice(): string
     {
@@ -110,12 +102,5 @@ class CartItem extends Model
             (string) $this->quantity,
             2
         );
-    }
-
-    public function addQuantity(int $quantity): CartItem
-    {
-        $this->quantity += $quantity;
-        $this->save();
-        return $this;
     }
 }

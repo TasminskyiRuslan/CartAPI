@@ -13,10 +13,8 @@ use Spatie\LaravelData\Data;
 class LoginUserData extends Data
 {
     /**
-     * Create a new instance of LoginUserData.
-     *
-     * @param string $email The email address of the user to log in.
-     * @param string $password The password for the user to log in.
+     * @param string $email
+     * @param string $password
      */
     public function __construct(
         #[Required]

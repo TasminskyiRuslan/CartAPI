@@ -36,6 +36,9 @@ use Illuminate\Support\Carbon;
  * @method static forUser(User $user)
  * @method static forGuest(string $guestToken)
  * @method static forOwner(CartIdentifierData $data)
+ * @property Carbon|null $expires_at
+ * @method static Builder<static>|Cart active()
+ * @method static Builder<static>|Cart whereExpiresAt($value)
  * @mixin Eloquent
  */
 class Cart extends Model
@@ -55,7 +58,7 @@ class Cart extends Model
     ];
 
     /**
-     * The attributes that should be cast to native types.
+     * Get the attributes that should be cast.
      *
      * @return array<string, string>
      */
@@ -67,26 +70,26 @@ class Cart extends Model
     }
 
     /**
-     * Get the prunable model query.
-     *
-     * @return Builder The query builder instance for retrieving prunable models.
-     */
-    public function prunable(): Builder
-    {
-        return static::where('expires_at', '<=', now());
-    }
-
-    /**
-     * Set the expiration date for the cart when creating.
+     * The "booted" method of the model.
+     * Registers a saving event to automatically refresh the expiration date.
      *
      * @return void
      */
     protected static function booted(): void
     {
-        static::creating(function (Cart $cart) {
-            $days = $cart->user_id ? config('cart.expiration_days.user') : config('cart.expiration_days.guest');
-            $cart->expires_at = now()->addDays($days);
+        static::saving(function (Cart $cart) {
+            $cart->refreshExpiration();
         });
+    }
+
+    /**
+     * Get the prunable model query for cleaning up expired carts.
+     *
+     * @return Builder<static>
+     */
+    public function prunable(): Builder
+    {
+        return static::where('expires_at', '<=', now());
     }
 
     /**
@@ -100,7 +103,7 @@ class Cart extends Model
     }
 
     /**
-     * Get the cart items for the cart.
+     * Get the cart items.
      *
      * @return HasMany<CartItem>
      */
@@ -110,50 +113,26 @@ class Cart extends Model
     }
 
     /**
-     * Scope a query to find a cart for the given guest token.
+     * Scope a query to filter carts by owner (either authenticated user or guest).
      *
-     * @param Builder $query The query builder instance to modify.
-     * @param string $guestToken The guest token to filter the carts by.
-     * @return Builder The modified query builder instance with the guest cart scope applied.
-     */
-    public function scopeForGuest(Builder $query, string $guestToken): Builder
-    {
-        return $query->where('guest_token', $guestToken);
-    }
-
-    /**
-     * Scope a query to find a cart for the given user.
-     *
-     * @param Builder $query The query builder instance to modify.
-     * @param User $user The user for whom to find the cart.
-     * @return Builder The modified query builder instance with the user cart scope applied.
-     */
-    public function scopeForUser(Builder $query, User $user): Builder
-    {
-        return $query->where('user_id', $user->id);
-    }
-
-    /**
-     * Scope a query to only include carts that belong to the specified owner, which can be either an authenticated user or a guest identified by a token.
-     *
-     * @param Builder $query The query builder instance to modify.
-     * @param CartIdentifierData $data The data used to identify the cart owner, which may include user information and guest token.
-     * @return Builder The modified query builder instance with the owner scope applied.
+     * @param Builder<static> $query
+     * @param CartIdentifierData $data
+     * @return Builder<static>
      */
     public function scopeForOwner(Builder $query, CartIdentifierData $data): Builder
     {
         return $query->when(
             $data->user,
-            fn (Builder $q) => $q->where('user_id', $data->user->id),
-            fn (Builder $q) => $q->where('guest_token', $data->guestToken)->whereNull('user_id')
+            fn (Builder $q) => $q->whereUserId($data->user->id),
+            fn (Builder $q) => $q->whereGuestToken($data->guestToken)->whereNull('user_id')
         );
     }
 
     /**
-     * Scope a query to only include active carts that have not expired.
+     * Scope a query to only include active (not expired) carts.
      *
-     * @param Builder $query The query builder instance to modify.
-     * @return Builder The modified query builder instance with the active carts scope applied.
+     * @param Builder<static> $query
+     * @return Builder<static>
      */
     public function scopeActive(Builder $query): Builder
     {
@@ -161,9 +140,9 @@ class Cart extends Model
     }
 
     /**
-     * Check if the cart is expired based on the expires_at attribute.
+     * Determine if the cart has expired.
      *
-     * @return bool True if the cart is expired, false otherwise.
+     * @return bool
      */
     public function isExpired(): bool
     {
@@ -171,34 +150,35 @@ class Cart extends Model
     }
 
     /**
-     * Extend the expiration date of the cart based on whether it belongs to an authenticated user or a guest. The expiration period is determined by the configuration settings for user and guest carts.
+     * Refresh the expiration date based on the owner type (user or guest).
      *
-     * @return void
+     * @return $this
      */
-    public function refreshExpiration(): void
+    public function refreshExpiration(): static
     {
         $days = $this->user_id
             ? config('cart.expiration_days.user')
             : config('cart.expiration_days.guest');
 
         $this->expires_at = now()->addDays($days);
-        $this->save();
+
+        return $this;
     }
 
     /**
-     * Calculate the total quantity of items in the cart.
+     * Calculate the total quantity of all items in the cart.
      *
-     * @return int The total quantity of items in the cart.
+     * @return int
      */
     public function calculateTotalItems(): int
     {
-        return $this->items->sum('quantity');
+        return $this->items()->sum('quantity');
     }
 
     /**
-     * Calculate the total price of the cart by summing the total price of each cart item.
+     * Calculate the total price of the cart.
      *
-     * @return string The total price of the cart formatted as a decimal string with 2 decimal places.
+     * @return string Decimal string with 2 decimal places.
      */
     public function calculateTotalPrice(): string
     {

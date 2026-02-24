@@ -6,11 +6,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property-read int $id Unique identifier for the product.
- * @property-read string $name Name of the product.
- * @property-read string|null $description Optional description of the product, providing additional details for customers.
- * @property-read string $price Current price of the product, providing a clear view of its cost to the customer.
- * @property-read string|null $image_path Optional path to the product's image, allowing for visual representation of the product in the application.
+ * @property-read int $id
+ * @property-read string $name
+ * @property-read string|null $description
+ * @property-read string $price
+ * @property-read string|null $image_path
  */
 class ProductResource extends JsonResource
 {
