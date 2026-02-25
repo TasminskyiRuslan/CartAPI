@@ -37,10 +37,10 @@ class MeController extends Controller
         ]
     )]
     /**
-     * Handle the incoming request to get the authenticated user's information.
+     * Get the currently authenticated user.
      *
-     * @param Request $request The incoming HTTP request.
-     * @return JsonResponse A JSON response containing the authenticated user's data.
+     * @param Request $request
+     * @return JsonResponse
      */
     public function __invoke(Request $request): JsonResponse
     {

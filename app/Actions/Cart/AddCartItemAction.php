@@ -40,10 +40,11 @@ class AddCartItemAction
                 $item->price_snapshot = $product->price;
                 $item->quantity = $itemData->quantity;
             } else {
-                $item->quantity += $itemData->quantity;
+                $item->quantity = min($item->quantity + $itemData->quantity, config('cart.max_quantity'));
             }
 
             $item->save();
+            $cart->refreshExpiration()->save();
 
             return new AddCartItemResultData(
                 cart: $cart,

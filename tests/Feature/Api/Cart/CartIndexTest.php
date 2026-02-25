@@ -20,32 +20,28 @@ describe('CartController -> index', function () {
 
         it('returns cart of authenticated user with items', function () {
             $user = User::factory()->create();
-            $cart = Cart::factory()->for($user)->create();
-            $items = CartItem::factory()->count(2)->for($cart)->create();
+            $userCart = Cart::factory()->for($user)->create();
+            $userCartItems = CartItem::factory()->count(2)->for($userCart)->create();
 
             Sanctum::actingAs($user);
 
             getJson(route('cart.index'))
                 ->assertOk()
-                ->assertJsonStructure([
-                    'data' => cartJsonStructure(),
-                ])
-                ->assertJsonPath('data.id', $cart->id)
-                ->assertJsonCount($items->count(), 'data.items');
+                ->assertJsonStructure(['data' => cartJsonStructure()])
+                ->assertJsonPath('data.id', $userCart->id)
+                ->assertJsonCount($userCartItems->count(), 'data.items');
         });
 
         it('returns empty items for authenticated user with empty cart', function () {
             $user = User::factory()->create();
-            $cart = Cart::factory()->for($user)->create();
+            $userCart = Cart::factory()->for($user)->create();
 
             Sanctum::actingAs($user);
 
             getJson(route('cart.index'))
                 ->assertOk()
-                ->assertJsonStructure([
-                    'data' => cartJsonStructure(),
-                ])
-                ->assertJsonPath('data.id', $cart->id)
+                ->assertJsonStructure(['data' => cartJsonStructure()])
+                ->assertJsonPath('data.id', $userCart->id)
                 ->assertJsonPath('data.items', [])
                 ->assertJsonPath('data.total_items', 0)
                 ->assertJsonPath('data.total_price', '0.00');
@@ -58,9 +54,7 @@ describe('CartController -> index', function () {
 
             getJson(route('cart.index'))
                 ->assertOk()
-                ->assertJsonStructure([
-                    'data' => cartJsonStructure(),
-                ])
+                ->assertJsonStructure(['data' => cartJsonStructure()])
                 ->assertJsonPath('data.id', null)
                 ->assertJsonPath('data.items', [])
                 ->assertJsonPath('data.total_items', 0)
@@ -68,27 +62,23 @@ describe('CartController -> index', function () {
         });
 
         it('returns cart of guest user with items', function () {
-            $cart = Cart::factory()->create(['user_id' => null, 'guest_token' => Str::uuid()]);
-            $items = CartItem::factory()->count(2)->for($cart)->create();
+            $guestCart = Cart::factory()->guest(Str::uuid()->toString())->create();
+            $guestCartItems = CartItem::factory()->count(2)->for($guestCart)->create();
 
-            getJson(route('cart.index'), [config('cart.guest_header') => $cart->guest_token])
+            getJson(route('cart.index'), [config('cart.guest_header') => $guestCart->guest_token])
                 ->assertOk()
-                ->assertJsonStructure([
-                    'data' => cartJsonStructure(),
-                ])
-                ->assertJsonPath('data.id', $cart->id)
-                ->assertJsonCount($items->count(), 'data.items');
+                ->assertJsonStructure(['data' => cartJsonStructure()])
+                ->assertJsonPath('data.id', $guestCart->id)
+                ->assertJsonCount($guestCartItems->count(), 'data.items');
         });
 
         it('returns empty items for guest user with empty cart', function () {
-            $cart = Cart::factory()->create(['user_id' => null, 'guest_token' => Str::uuid()]);
+            $guestCart = Cart::factory()->guest(Str::uuid()->toString())->create();
 
-            getJson(route('cart.index'), [config('cart.guest_header') => $cart->guest_token])
+            getJson(route('cart.index'), [config('cart.guest_header') => $guestCart->guest_token])
                 ->assertOk()
-                ->assertJsonStructure([
-                    'data' => cartJsonStructure(),
-                ])
-                ->assertJsonPath('data.id', $cart->id)
+                ->assertJsonStructure(['data' => cartJsonStructure()])
+                ->assertJsonPath('data.id', $guestCart->id)
                 ->assertJsonPath('data.items', [])
                 ->assertJsonPath('data.total_items', 0)
                 ->assertJsonPath('data.total_price', '0.00');
@@ -98,9 +88,7 @@ describe('CartController -> index', function () {
         it('returns empty cart structure for guest user without cart', function () {
             getJson(route('cart.index'))
                 ->assertOk()
-                ->assertJsonStructure([
-                    'data' => cartJsonStructure(),
-                ])
+                ->assertJsonStructure(['data' => cartJsonStructure()])
                 ->assertJsonPath('data.id', null)
                 ->assertJsonPath('data.items', [])
                 ->assertJsonPath('data.total_items', 0)
@@ -109,10 +97,7 @@ describe('CartController -> index', function () {
 
         it('does not return expired cart for authenticated user', function () {
             $user = User::factory()->create();
-
-            $cart = Cart::factory()->for($user)->createQuietly([
-                'expires_at' => now()->subDay(),
-            ]);
+            $userCart = Cart::factory()->for($user)->createQuietly(['expires_at' => now()->subDay()]);
 
             Sanctum::actingAs($user);
 
@@ -125,13 +110,9 @@ describe('CartController -> index', function () {
         });
 
         it('does not return expired cart for guest user', function () {
-            $cart = Cart::factory()->createQuietly([
-                'user_id' => null,
-                'guest_token' => Str::uuid(),
-                'expires_at' => now()->subDay(),
-            ]);
+            $guestCart = Cart::factory()->guest(Str::uuid()->toString())->createQuietly(['expires_at' => now()->subDay()]);
 
-            getJson(route('cart.index'), [config('cart.guest_header') => $cart->guest_token])
+            getJson(route('cart.index'), [config('cart.guest_header') => $guestCart->guest_token])
                 ->assertOk()
                 ->assertJsonPath('data.id', null)
                 ->assertJsonPath('data.items', [])

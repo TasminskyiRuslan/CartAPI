@@ -16,6 +16,7 @@ class LoginController extends Controller
         path: '/auth/login',
         description: 'Authenticate user.',
         summary: 'Login',
+        security: [['guest_token' => []], []],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(ref: '#/components/schemas/LoginUserRequest')
@@ -41,11 +42,11 @@ class LoginController extends Controller
         ]
     )]
     /**
-     * Handle the incoming login request.
+     * Handle the user login request.
      *
-     * @param LoginUserData $data The data for logging in a user.
-     * @param LoginUserAction $action The action to handle user login.
-     * @return JsonResponse A JSON response containing the authenticated user's data and access token.
+     * @param LoginUserData $data
+     * @param LoginUserAction $action
+     * @return JsonResponse
      */
     public function __invoke(LoginUserData $data, LoginUserAction $action): JsonResponse
     {

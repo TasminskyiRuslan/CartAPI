@@ -17,6 +17,7 @@ class RegisterController extends Controller
         path: '/auth/register',
         description: 'Register a new user.',
         summary: 'Register',
+        security: [['guest_token' => []], []],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(ref: '#/components/schemas/RegisterUserRequest')
@@ -42,12 +43,12 @@ class RegisterController extends Controller
         ]
     )]
     /**
-     * Handle the incoming registration request.
+     * Handle the user registration request.
      *
-     * @param RegisterUserData $data The data for registering a new user.
-     * @param RegisterUserAction $action The action to handle user registration.
-     * @return JsonResponse A JSON response containing the authenticated user's data and access token.
-     * @throws Throwable If an error occurs during the registration process.
+     * @param RegisterUserData $data
+     * @param RegisterUserAction $action
+     * @return JsonResponse
+     * @throws Throwable
      */
     public function __invoke(RegisterUserData $data, RegisterUserAction $action): JsonResponse
     {

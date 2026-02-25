@@ -29,11 +29,11 @@ class LogoutController extends Controller
         ]
     )]
     /**
-     * Handle the incoming request to logout the authenticated user.
+     * Handle the user logout request.
      *
-     * @param Request $request The incoming HTTP request containing the authenticated user.
-     * @param LogoutUserAction $action The action responsible for logging out the user.
-     * @return Response A response indicating the result of the logout operation.
+     * @param Request $request
+     * @param LogoutUserAction $action
+     * @return Response
      */
     public function __invoke(Request $request, LogoutUserAction $action): Response
     {

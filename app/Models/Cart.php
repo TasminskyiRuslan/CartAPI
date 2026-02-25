@@ -77,7 +77,7 @@ class Cart extends Model
      */
     protected static function booted(): void
     {
-        static::saving(function (Cart $cart) {
+        static::creating(function (Cart $cart) {
             $cart->refreshExpiration();
         });
     }
@@ -178,7 +178,7 @@ class Cart extends Model
     /**
      * Calculate the total price of the cart.
      *
-     * @return string Decimal string with 2 decimal places.
+     * @return string
      */
     public function calculateTotalPrice(): string
     {
@@ -187,5 +187,19 @@ class Cart extends Model
             $totalPrice = bcadd($totalPrice, $item->calculateTotalPrice(), 2);
         }
         return $totalPrice;
+    }
+
+    /**
+     * Assign the cart to a specific user and remove guest status.
+     *
+     * @param int $userId
+     * @return $this
+     */
+    public function assignToUser(int $userId): static
+    {
+        $this->user_id = $userId;
+        $this->guest_token = null;
+
+        return $this;
     }
 }

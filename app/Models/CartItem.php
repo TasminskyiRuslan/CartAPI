@@ -51,13 +51,6 @@ class CartItem extends Model
     ];
 
     /**
-     * The relationships that should be touched on save.
-     *
-     * @var list<string>
-     */
-    protected $touches = ['cart'];
-
-    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -93,7 +86,7 @@ class CartItem extends Model
     /**
      * Calculate the total price for this item (price * quantity).
      *
-     * @return string Decimal string with 2 decimal places.
+     * @return string
      */
     public function calculateTotalPrice(): string
     {

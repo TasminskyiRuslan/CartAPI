@@ -19,8 +19,8 @@ describe('CartController -> destroy', function () {
     describe('success', function () {
         it('delete cart of authenticated user with items', function () {
             $user = User::factory()->create();
-            $cart = Cart::factory()->for($user)->create();
-            $items = CartItem::factory()->count(7)->for($cart)->create();
+            $userCart = Cart::factory()->for($user)->create();
+            $userCartItems = CartItem::factory()->count(7)->for($userCart)->create();
 
             Sanctum::actingAs($user);
 
@@ -28,25 +28,25 @@ describe('CartController -> destroy', function () {
                 ->assertNoContent();
 
             $this->assertDatabaseMissing('carts', [
-                'id' => $cart->id,
+                'id' => $userCart->id,
             ]);
             $this->assertDatabaseMissing('cart_items', [
-                'cart_id' => $cart->id,
+                'cart_id' => $userCart->id,
             ]);
         });
 
         it('delete cart of guest user with items', function () {
-            $cart = Cart::factory()->create(['user_id' => null, 'guest_token' => Str::uuid()]);
-            $items = CartItem::factory()->count(2)->for($cart)->create();
+            $guestCart = Cart::factory()->guest(Str::uuid()->toString())->create();
+            $guestCartItems = CartItem::factory()->count(2)->for($guestCart)->create();
 
-            deleteJson(route('cart.destroy'), [], [config('cart.guest_header') => $cart->guest_token])
+            deleteJson(route('cart.destroy'), [], [config('cart.guest_header') => $guestCart->guest_token])
                 ->assertNoContent();
 
             $this->assertDatabaseMissing('carts', [
-                'id' => $cart->id,
+                'id' => $guestCart->id,
             ]);
             $this->assertDatabaseMissing('cart_items', [
-                'cart_id' => $cart->id,
+                'cart_id' => $guestCart->id,
             ]);
         });
 
@@ -60,7 +60,7 @@ describe('CartController -> destroy', function () {
         });
 
         it('returns no content even if guest cart does not exist', function () {
-            deleteJson(route('cart.destroy'), [], [config('cart.guest_header') => Str::uuid()])
+            deleteJson(route('cart.destroy'), [], [config('cart.guest_header') => Str::uuid()->toString()])
                 ->assertNoContent();
         });
 
@@ -80,7 +80,7 @@ describe('CartController -> destroy', function () {
         it('cannot delete cart belonging to another user', function () {
             $user = User::factory()->create();
             $userCart = Cart::factory()->for($user)->create();
-            $guestCart = Cart::factory()->create(['user_id' => null, 'guest_token' => Str::uuid()]);
+            $guestCart = Cart::factory()->guest(Str::uuid()->toString())->create();
 
             deleteJson(route('cart.destroy'), [], [config('cart.guest_header') => $guestCart->guest_token])
                 ->assertNoContent();

@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Actions\Cart;
+
+use App\Models\Cart;
+use Illuminate\Support\Facades\DB;
+use Throwable;
+
+class MergeCartAction
+{
+    /**
+     * Merge a guest cart into an authenticated user's cart.
+     *
+     * @param int $userId
+     * @param string $guestToken
+     * @return void
+     * @throws Throwable
+     */
+    public function handle(int $userId, string $guestToken): void
+    {
+        DB::transaction(function () use ($userId, $guestToken) {
+            $guestCart = Cart::whereGuestToken($guestToken)->with('items')->lockForUpdate()->first();
+
+            if (!$guestCart || $guestCart->isExpired()) {
+                $guestCart?->delete();
+                return;
+            }
+
+            $userCart = Cart::whereUserId($userId)->with('items')->lockForUpdate()->first();
+
+            if (!$userCart || $userCart->isExpired()) {
+                $userCart?->delete();
+                $guestCart->assignToUser($userId)->refreshExpiration()->save();
+                return;
+            }
+
+            $userItems = $userCart->items->keyBy('product_id');
+
+            foreach ($guestCart->items as $guestItem) {
+                $userItem = $userItems->get($guestItem->product_id);
+
+                if ($userItem) {
+                    $userItem->quantity = min($userItem->quantity + $guestItem->quantity, config('cart.max_quantity'));
+                    $userItem->save();
+                } else {
+                    $guestItem->cart_id = $userCart->id;
+                    $guestItem->save();
+                }
+            }
+
+            $userCart->refreshExpiration()->save();
+            $guestCart->delete();
+        });
+    }
+
+}

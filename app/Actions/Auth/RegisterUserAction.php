@@ -2,9 +2,10 @@
 
 namespace App\Actions\Auth;
 
-use App\Data\Auth\AuthData;
+use App\Data\Auth\AuthResultData;
 use App\Data\Auth\Requests\RegisterUserData;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -20,19 +21,21 @@ class RegisterUserAction
     }
 
     /**
-     * Handle the user registration process.
+     * Register a new user within a transaction.
      *
-     * @param RegisterUserData $data The data for registering a new user.
-     * @throws Throwable If an error occurs during the registration process.
-     * @return AuthData An array containing the newly registered user and the issued token.
+     * @param RegisterUserData $data
+     * @return AuthResultData
+     * @throws Throwable
      */
-    public function handle(RegisterUserData $data): AuthData
+    public function handle(RegisterUserData $data): AuthResultData
     {
         return DB::transaction(function () use ($data) {
             $user = User::create($data->toArray());
             $token = $this->issueTokenAction->handle($user);
 
-            return new AuthData(
+            event(new Registered($user));
+
+            return new AuthResultData(
                 user: $user,
                 token: $token,
             );
