@@ -32,12 +32,12 @@ class LogoutController extends Controller
      * Handle the user logout request.
      *
      * @param Request $request
-     * @param LogoutUserAction $action
+     * @param LogoutUserAction $logoutUserAction
      * @return Response
      */
-    public function __invoke(Request $request, LogoutUserAction $action): Response
+    public function __invoke(Request $request, LogoutUserAction $logoutUserAction): Response
     {
-        $action->handle($request->user());
+        $logoutUserAction->handle($request->user());
         return response()->noContent();
     }
 }

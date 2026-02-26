@@ -23,14 +23,14 @@ class RegisterUserAction
     /**
      * Register a new user within a transaction.
      *
-     * @param RegisterUserData $data
+     * @param RegisterUserData $userData
      * @return AuthData
      * @throws Throwable
      */
-    public function handle(RegisterUserData $data): AuthData
+    public function handle(RegisterUserData $userData): AuthData
     {
-        return DB::transaction(function () use ($data) {
-            $user = User::create($data->toArray());
+        return DB::transaction(function () use ($userData) {
+            $user = User::create($userData->toArray());
             $token = $this->issueTokenAction->handle($user);
 
             event(new Registered($user));

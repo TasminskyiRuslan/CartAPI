@@ -14,8 +14,9 @@ describe('MeController', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-        it('returns authenticated user data', function () {
+        it('returns current authenticated user profile', function () {
             $user = User::factory()->create();
+
             Sanctum::actingAs($user);
 
             getJson(route('auth.me'))
@@ -33,7 +34,7 @@ describe('MeController', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('fails for unauthenticated user', function () {
+        it('prevents access for unauthenticated user', function () {
             getJson(route('auth.me'))
                 ->assertUnauthorized();
         });

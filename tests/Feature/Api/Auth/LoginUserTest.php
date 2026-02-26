@@ -21,7 +21,7 @@ describe('LoginController', function () {
                 ->assertJsonValidationErrors(['email', 'password']);
         });
 
-        it('fails when the email does not exist', function () {
+        it('fails when email does not exist', function () {
             postJson(route('auth.login'), [
                 'email' => 'nonexistent@example.com',
                 'password' => 'password123',
@@ -30,7 +30,7 @@ describe('LoginController', function () {
                 ->assertJsonValidationErrors(['email']);
         });
 
-        it('fails when the email format is invalid', function () {
+        it('fails when email format is invalid', function () {
             postJson(route('auth.login'), [
                 'email' => 'invalid-email',
                 'password' => 'password123',
@@ -39,7 +39,7 @@ describe('LoginController', function () {
                 ->assertJsonValidationErrors(['email']);
         });
 
-        it('fails when credentials are incorrect', function () {
+        it('fails when password is incorrect', function () {
             $user = User::factory()->create();
 
             postJson(route('auth.login'), [
@@ -58,7 +58,7 @@ describe('LoginController', function () {
     */
     describe('success', function () {
 
-        it('authenticates the user', function () {
+        it('authenticates user and returns access token', function () {
             $password = 'password123';
 
             $user = User::factory()->create([

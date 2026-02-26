@@ -12,22 +12,20 @@ uses(RefreshDatabase::class);
 describe('MergeCartAction', function () {
 
     beforeEach(function () {
-       $this->guestToken = Str::uuid()->toString();
        $this->user = User::factory()->create();
        $this->action = app(MergeCartAction::class);
     });
 
     it('returns if guest cart does not exist', function () {
-        $this->action->handle($this->user->id, $this->guestToken);
+        $this->action->handle($this->user->id, Str::uuid()->toString());
         $this->assertDatabaseMissing('carts', ['user_id' => $this->user->id]);
     });
 
     it('deletes guest cart and returns if it is expired', function () {
-        $guestCart = Cart::factory()->guest($this->guestToken)->createQuietly(['expires_at' => now()->subDay()]);
-        $product = Product::factory()->create();
-        $guestCartItem = CartItem::factory()->for($guestCart)->for($product)->create();
+        $guestCart = Cart::factory()->guest()->expired()->create();
+        $guestCartItem = CartItem::factory()->for($guestCart)->create();
 
-        $this->action->handle($this->user->id, $this->guestToken);
+        $this->action->handle($this->user->id, $guestCart->guest_token);
 
         $this->assertDatabaseMissing('carts', [
             'id' => $guestCart->id
@@ -37,10 +35,10 @@ describe('MergeCartAction', function () {
         ]);
     });
 
-    it('assigns guest cart to user if user has no cart', function () {
-        $guestCart = Cart::factory()->guest($this->guestToken)->create();
+    it('transfers guest cart to user when user has no cart', function () {
+        $guestCart = Cart::factory()->guest()->create();
 
-        $this->action->handle($this->user->id, $this->guestToken);
+        $this->action->handle($this->user->id, $guestCart->guest_token);
 
         $this->assertDatabaseHas('carts', [
             'id' => $guestCart->id,
@@ -49,14 +47,14 @@ describe('MergeCartAction', function () {
         ]);
     });
 
-    it('deletes user expired cart and assigns guest cart to user', function () {
+    it('replaces expired user cart with guest cart', function () {
         $product = Product::factory()->create();
-        $expiredUserCart = Cart::factory()->for($this->user)->createQuietly(['expires_at' => now()->subDay()]);
+        $expiredUserCart = Cart::factory()->for($this->user)->expired()->create();
         $userCartItem = CartItem::factory()->for($expiredUserCart)->for($product)->create();
-        $guestCart = Cart::factory()->guest($this->guestToken)->create();
+        $guestCart = Cart::factory()->guest()->create();
         $guestCartItem = CartItem::factory()->for($guestCart)->for($product)->create();
 
-        $this->action->handle($this->user->id, $this->guestToken);
+        $this->action->handle($this->user->id, $guestCart->guest_token);
 
         $this->assertDatabaseMissing('carts', [
             'id' => $expiredUserCart->id
@@ -75,14 +73,14 @@ describe('MergeCartAction', function () {
         ]);
     });
 
-    it('merges same products, sums quantity and deletes guest cart', function () {
+    it('merges identical products and sums quantities', function () {
         $product = Product::factory()->create();
         $userCart = Cart::factory()->for($this->user)->create();
         $userCartItem = CartItem::factory()->for($userCart)->for($product)->create(['quantity' => 2]);
-        $guestCart = Cart::factory()->guest($this->guestToken)->create();
+        $guestCart = Cart::factory()->guest()->create();
         $guestCartItem = CartItem::factory()->for($guestCart)->for($product)->create(['quantity' => 3]);
 
-        $this->action->handle($this->user->id, $this->guestToken);
+        $this->action->handle($this->user->id, $guestCart->guest_token);
 
         $this->assertDatabaseMissing('carts', [
             'id' => $guestCart->id
@@ -102,10 +100,10 @@ describe('MergeCartAction', function () {
         $products = Product::factory()->count(2)->create();
         $userCart = Cart::factory()->for($this->user)->create();
         $userCartItem = CartItem::factory()->for($userCart)->for($products[0])->create();
-        $guestCart = Cart::factory()->guest($this->guestToken)->create();
+        $guestCart = Cart::factory()->guest()->create();
         $guestCartItem = CartItem::factory()->for($guestCart)->for($products[1])->create();
 
-        $this->action->handle($this->user->id, $this->guestToken);
+        $this->action->handle($this->user->id, $guestCart->guest_token);
 
         $this->assertDatabaseMissing('carts', [
             'id' => $guestCart->id
@@ -131,13 +129,13 @@ describe('MergeCartAction', function () {
             CartItem::factory()->for($userCart)->for($products[0])->create(['quantity' => 2]),
             CartItem::factory()->for($userCart)->for($products[1])->create(['quantity' => 1]),
         ];
-        $guestCart = Cart::factory()->guest($this->guestToken)->create();
+        $guestCart = Cart::factory()->guest()->create();
         $guestCartItems = [
             CartItem::factory()->for($guestCart)->for($products[0])->create(['quantity' => 3]),
             CartItem::factory()->for($guestCart)->for($products[2])->create(['quantity' => 4]),
         ];
 
-        $this->action->handle($this->user->id, $this->guestToken);
+        $this->action->handle($this->user->id, $guestCart->guest_token);
 
         $this->assertDatabaseMissing('carts', [
             'id' => $guestCart->id
@@ -158,12 +156,11 @@ describe('MergeCartAction', function () {
 
     it('refreshes user cart expiration and deletes empty guest cart without modifying user items', function () {
         $initialExpiration = now()->addHour();
-        $product = Product::factory()->create();
         $userCart = Cart::factory()->for($this->user)->createQuietly(['expires_at' => $initialExpiration]);
-        $userCartItem = CartItem::factory()->for($userCart)->for($product)->create(['quantity' => 2]);
-        $guestCart = Cart::factory()->guest($this->guestToken)->create();
+        $userCartItem = CartItem::factory()->for($userCart)->create(['quantity' => 2]);
+        $guestCart = Cart::factory()->guest()->create();
 
-        $this->action->handle($this->user->id, $this->guestToken);
+        $this->action->handle($this->user->id, $guestCart->guest_token);
 
         $this->assertDatabaseMissing('carts', [
             'id' => $guestCart->id
@@ -174,19 +171,21 @@ describe('MergeCartAction', function () {
             'quantity' => $userCartItem->quantity,
         ]);
 
-        $userCart->refresh();
-        expect($userCart->expires_at->gt($initialExpiration))->toBeTrue();
+        expect($userCart->refresh()->expires_at->gt($initialExpiration))->toBeTrue();
     });
 
     it('is idempotent when executed multiple times', function () {
         $product = Product::factory()->create();
-        $guestCart = Cart::factory()->guest($this->guestToken)->create();
+        $guestCart = Cart::factory()->guest()->create();
         $guestCartItem = CartItem::factory()->for($guestCart)->for($product)->create(['quantity' => 2]);
 
-        $this->action->handle($this->user->id, $this->guestToken);
-        $this->action->handle($this->user->id, $this->guestToken);
+        $this->action->handle($this->user->id, $guestCart->guest_token);
+        $this->action->handle($this->user->id, $guestCart->guest_token);
 
-        $this->assertDatabaseCount('carts', 1);
+        $this->assertDatabaseHas('carts', [
+            'user_id' => $this->user->id,
+            'guest_token' => null
+        ]);
         $this->assertDatabaseHas('cart_items', [
             'id' => $guestCartItem->id,
             'product_id' => $guestCartItem->product_id,
@@ -194,14 +193,14 @@ describe('MergeCartAction', function () {
         ]);
     });
 
-    it('does not exceed 99 units per product during merge', function () {
+    it('caps product quantity to maximum limit during merge', function () {
         $product = Product::factory()->create();
         $userCart = Cart::factory()->for($this->user)->create();
         $userCartItem = CartItem::factory()->for($userCart)->for($product)->create(['quantity' => 60]);
-        $guestCart = Cart::factory()->guest($this->guestToken)->create();
+        $guestCart = Cart::factory()->guest()->create();
         $guestCartItem = CartItem::factory()->for($guestCart)->for($product)->create(['quantity' => 50]);
 
-        $this->action->handle($this->user->id, $this->guestToken);
+        $this->action->handle($this->user->id, $guestCart->guest_token);
 
         $this->assertDatabaseMissing('carts', [
             'id' => $guestCart->id

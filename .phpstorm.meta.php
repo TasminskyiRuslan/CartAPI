@@ -2445,8 +2445,7 @@ namespace PHPSTORM_META {
         registerArgumentsSet('routes', 
 'l5-swagger.default.api','l5-swagger.default.docs','l5-swagger.default.asset','l5-swagger.default.oauth2_callback','boost.browser-logs',
 'sanctum.csrf-cookie','auth.me','auth.register','auth.login','auth.logout',
-'cart.index','cart.destroy','cart.item.store',
-'storage.local',);
+'cart.index','cart.destroy','cart.item.store','cart.item.update','storage.local',);
         registerArgumentsSet('views', 
 'l5-swagger::index','vendor.l5-swagger.index','welcome','l5-swagger::index','laravel-exceptions-renderer::components.badge',
 'laravel-exceptions-renderer::components.empty-state','laravel-exceptions-renderer::components.file-with-line','laravel-exceptions-renderer::components.formatted-source','laravel-exceptions-renderer::components.frame','laravel-exceptions-renderer::components.frame-code',

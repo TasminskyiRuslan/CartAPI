@@ -39,4 +39,11 @@ class CartFactory extends Factory
             'expires_at' => now()->addDays(config('cart.expiration_days.guest')),
         ]);
     }
+
+    public function expired(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'expires_at' => now()->subDay(),
+        ]);
+    }
 }

@@ -19,14 +19,14 @@ class MergeCartAction
     public function handle(int $userId, string $guestToken): void
     {
         DB::transaction(function () use ($userId, $guestToken) {
-            $guestCart = Cart::whereGuestToken($guestToken)->with('items')->lockForUpdate()->first();
+            $guestCart = Cart::whereGuestToken($guestToken)->with('items.product')->lockForUpdate()->first();
 
             if (!$guestCart || $guestCart->isExpired()) {
                 $guestCart?->delete();
                 return;
             }
 
-            $userCart = Cart::whereUserId($userId)->with('items')->lockForUpdate()->first();
+            $userCart = Cart::whereUserId($userId)->with('items.product')->lockForUpdate()->first();
 
             if (!$userCart || $userCart->isExpired()) {
                 $userCart?->delete();

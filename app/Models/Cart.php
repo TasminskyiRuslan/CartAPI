@@ -78,7 +78,9 @@ class Cart extends Model
     protected static function booted(): void
     {
         static::creating(function (Cart $cart) {
-            $cart->refreshExpiration();
+            if (is_null($cart->expires_at)) {
+                $cart->refreshExpiration();
+            }
         });
     }
 

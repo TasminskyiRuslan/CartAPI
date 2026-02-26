@@ -22,7 +22,7 @@ describe('RegisterController', function () {
                 ->assertJsonValidationErrors(['name', 'email', 'password']);
         });
 
-        it('fails when the email is already taken', function () {
+        it('fails when email is already taken', function () {
             $data = registrationPayload();
 
             User::factory()->create(['email' => $data['email']]);
@@ -32,13 +32,13 @@ describe('RegisterController', function () {
                 ->assertJsonValidationErrors(['email']);
         });
 
-        it('fails when the email format is invalid', function () {
+        it('fails when email format is invalid', function () {
             postJson(route('auth.register'), registrationPayload(['email' => 'invalid-email']))
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email']);
         });
 
-        it('fails when the password is too short', function () {
+        it('fails when password is too short', function () {
             postJson(route('auth.register'), registrationPayload([
                 'password' => '123',
                 'password_confirmation' => '123',
@@ -47,7 +47,7 @@ describe('RegisterController', function () {
                 ->assertJsonValidationErrors(['password']);
         });
 
-        it('fails when the password confirmation does not match', function () {
+        it('fails when password confirmation does not match', function () {
             postJson(route('auth.register'), registrationPayload([
                 'password_confirmation' => 'different',
             ]))
@@ -63,7 +63,7 @@ describe('RegisterController', function () {
     */
     describe('success', function () {
 
-        it('registers a user', function () {
+        it('registers user and returns access token', function () {
             $data = registrationPayload();
 
             postJson(route('auth.register'), $data)

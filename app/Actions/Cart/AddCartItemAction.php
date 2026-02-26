@@ -19,16 +19,16 @@ class AddCartItemAction
     ) {}
 
     /**
-     * Add a product to the cart or update its quantity.
+     * Add a product to the cart or update its quantity and refresh cart expiration.
      *
      * @param CartIdentifierData $identifierData
      * @param CreateCartItemData $itemData
      * @return AddCartItemData
      * @throws Throwable
      */
-    public function handle(CartIdentifierData $identifierData, CreateCartItemData $itemData): AddCartItemData
+    public function handle(CreateCartItemData $itemData, CartIdentifierData $identifierData): AddCartItemData
     {
-        return DB::transaction(function () use ($identifierData, $itemData) {
+        return DB::transaction(function () use ($itemData, $identifierData) {
             $cart = $this->resolveCartAction->handle($identifierData);
             $product = Product::findOrFail($itemData->productId);
 

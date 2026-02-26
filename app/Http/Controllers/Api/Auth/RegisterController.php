@@ -45,14 +45,14 @@ class RegisterController extends Controller
     /**
      * Handle the user registration request.
      *
-     * @param RegisterUserData $data
-     * @param RegisterUserAction $action
+     * @param RegisterUserData $userData
+     * @param RegisterUserAction $registerUserAction
      * @return JsonResponse
      * @throws Throwable
      */
-    public function __invoke(RegisterUserData $data, RegisterUserAction $action): JsonResponse
+    public function __invoke(RegisterUserData $userData, RegisterUserAction $registerUserAction): JsonResponse
     {
-        $authData = $action->handle($data);
+        $authData = $registerUserAction->handle($userData);
 
         return AuthResource::make($authData)
             ->response()

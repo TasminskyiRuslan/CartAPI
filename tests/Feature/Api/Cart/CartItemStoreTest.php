@@ -18,6 +18,7 @@ describe('CartItemController -> store', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
+
         it('fails when required fields are missing', function () {
             postJson(route('cart.item.store'), [])
                 ->assertUnprocessable()
@@ -54,10 +55,11 @@ describe('CartItemController -> store', function () {
 
         it('fails when quantity exceeds the maximum limit (99)', function () {
             $product = Product::factory()->create();
+            $max = config('cart.max_quantity');
 
             postJson(route('cart.item.store'), [
                 'product_id' => $product->id,
-                'quantity' => 100,
+                'quantity' => $max + 1,
             ])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['quantity']);
@@ -71,71 +73,71 @@ describe('CartItemController -> store', function () {
     */
     describe('success', function () {
 
-        beforeEach(function () {
-            $this->user = User::factory()->create();
-            $this->originalPrice = '500.00';
-            $this->product = Product::factory()->create(['price' => $this->originalPrice]);
-        });
+        it('adds new item with default quantity when not provided', function () {
+            $user = User::factory()->create();
+            $product = Product::factory()->create(['price' => '500.00']);
 
-        it('adds a new item with default quantity (1) when quantity is not provided', function () {
-            Sanctum::actingAs($this->user);
+            Sanctum::actingAs($user);
 
-            postJson(route('cart.item.store'), ['product_id' => $this->product->id])
+            postJson(route('cart.item.store'), ['product_id' => $product->id])
                 ->assertCreated()
                 ->assertJsonStructure(['data' => cartJsonStructure()])
-                ->assertJsonPath('data.items.0.price_snapshot', $this->product->price)
+                ->assertJsonPath('data.items.0.price_snapshot', $product->price)
                 ->assertJsonPath('data.items.0.quantity', 1)
-                ->assertJsonPath('data.items.0.total_price', $this->product->price)
-                ->assertJsonPath('data.items.0.product.id', $this->product->id)
+                ->assertJsonPath('data.items.0.total_price', $product->price)
+                ->assertJsonPath('data.items.0.product.id', $product->id)
                 ->assertJsonPath('data.total_items', 1)
-                ->assertJsonPath('data.total_price', $this->product->price);
+                ->assertJsonPath('data.total_price', $product->price);
         });
 
-        it('adds a new item and creates a new cart for an authenticated user', function () {
+        it('creates new cart and adds item for an authenticated user', function () {
+            $user = User::factory()->create();
+            $product = Product::factory()->create(['price' => '100.00']);
             $quantity = 4;
-            $expectedTotalPrice = bcmul($this->product->price, $quantity, 2);
+            $expectedTotalPrice = bcmul($product->price, $quantity, 2);
 
-            Sanctum::actingAs($this->user);
+            Sanctum::actingAs($user);
 
             postJson(route('cart.item.store'), [
-                'product_id' => $this->product->id,
+                'product_id' => $product->id,
                 'quantity' => $quantity,
             ])
                 ->assertCreated()
                 ->assertJsonStructure(['data' => cartJsonStructure()])
-                ->assertJsonPath('data.items.0.price_snapshot', $this->product->price)
+                ->assertJsonPath('data.items.0.price_snapshot', $product->price)
                 ->assertJsonPath('data.items.0.quantity', $quantity)
                 ->assertJsonPath('data.items.0.total_price', $expectedTotalPrice)
-                ->assertJsonPath('data.items.0.product.id', $this->product->id)
+                ->assertJsonPath('data.items.0.product.id', $product->id)
                 ->assertJsonPath('data.total_items', $quantity)
                 ->assertJsonPath('data.total_price', $expectedTotalPrice);
 
             $this->assertDatabaseHas('carts', [
-                'user_id' => $this->user->id,
+                'user_id' => $user->id,
                 'guest_token' => null,
             ]);
             $this->assertDatabaseHas('cart_items', [
-                'product_id' => $this->product->id,
-                'price_snapshot' => $this->product->price,
+                'product_id' => $product->id,
+                'price_snapshot' => $product->price,
                 'quantity' => $quantity,
             ]);
         });
 
-        it('adds a new item and creates a new cart for a guest user', function () {
+        it('creates new cart and adds item for a guest user', function () {
             $guestToken = Str::uuid()->toString();
+            $product = Product::factory()->create(['price' => '500.00']);
             $quantity = 4;
-            $expectedTotalPrice = bcmul($this->product->price, $quantity, 2);
+            $expectedTotalPrice = bcmul($product->price, $quantity, 2);
 
             postJson(route('cart.item.store'), [
-                'product_id' => $this->product->id,
+                'product_id' => $product->id,
                 'quantity' => $quantity,
             ], [config('cart.guest_header') => $guestToken])
                 ->assertCreated()
                 ->assertJsonStructure(['data' => cartJsonStructure()])
-                ->assertJsonPath('data.items.0.price_snapshot', $this->product->price)
+                ->assertJsonPath('data.items.0.price_snapshot', $product->price)
                 ->assertJsonPath('data.items.0.quantity', $quantity)
                 ->assertJsonPath('data.items.0.total_price', $expectedTotalPrice)
-                ->assertJsonPath('data.items.0.product.id', $this->product->id)
+                ->assertJsonPath('data.items.0.product.id', $product->id)
                 ->assertJsonPath('data.total_items', $quantity)
                 ->assertJsonPath('data.total_price', $expectedTotalPrice);
 
@@ -144,66 +146,71 @@ describe('CartItemController -> store', function () {
                 'guest_token' => $guestToken,
             ]);
             $this->assertDatabaseHas('cart_items', [
-                'product_id' => $this->product->id,
-                'price_snapshot' => $this->product->price,
+                'product_id' => $product->id,
+                'price_snapshot' => $product->price,
                 'quantity' => $quantity,
             ]);
         });
 
-        it('adds a new item to an existing cart for an authenticated user without creating duplicates', function () {
-            $userCart = Cart::factory()->for($this->user)->create();
+        it('adds item to existing cart for an authenticated user without duplicating cart', function () {
+            $user = User::factory()->create();
+            $product = Product::factory()->create();
+            $userCart = Cart::factory()->for($user)->create();
             $quantity = 4;
 
-            Sanctum::actingAs($this->user);
+            Sanctum::actingAs($user);
 
             postJson(route('cart.item.store'), [
-                'product_id' => $this->product->id,
+                'product_id' => $product->id,
                 'quantity' => $quantity,
             ])
                 ->assertCreated();
 
             $this->assertDatabaseHas('cart_items', [
-                'product_id' => $this->product->id,
+                'product_id' => $product->id,
                 'quantity' => $quantity,
             ]);
 
-            expect(Cart::whereUserId($this->user->id)->count())->toBe(1);
+            expect(Cart::whereUserId($user->id)->count())->toBe(1);
         });
 
-        it('adds a new item to an existing cart for a guest user without creating duplicates', function () {
+        it('adds item to existing cart for a guest user without duplicating cart', function () {
             $guestCart = Cart::factory()->guest()->create();
+            $product = Product::factory()->create();
             $quantity = 4;
 
             postJson(route('cart.item.store'), [
-                'product_id' => $this->product->id,
+                'product_id' => $product->id,
                 'quantity' => $quantity,
             ], [config('cart.guest_header') => $guestCart->guest_token])
                 ->assertCreated();
 
             $this->assertDatabaseHas('cart_items', [
-                'product_id' => $this->product->id,
+                'product_id' => $product->id,
                 'quantity' => $quantity,
             ]);
 
             expect(Cart::whereGuestToken($guestCart->guest_token)->count())->toBe(1);
         });
 
-        it('updates the quantity of an existing item', function () {
-            $userCart = Cart::factory()->for($this->user)->create();
+        it('increments quantity of existing item', function () {
+            $user = User::factory()->create();
+            $product = Product::factory()->create(['price' => '500.00']);
+            $userCart = Cart::factory()->for($user)->create();
             $initialQuantity = 2;
             $addedQuantity = 3;
             $expectedQuantity = $initialQuantity + $addedQuantity;
-            $expectedTotalPrice = bcmul($this->product->price, $expectedQuantity, 2);
+            $expectedTotalPrice = bcmul($product->price, $expectedQuantity, 2);
 
             $userCartItem = CartItem::factory()->for($userCart)->create([
-                'product_id' => $this->product->id,
+                'product_id' => $product->id,
                 'quantity' => $initialQuantity,
             ]);
 
-            Sanctum::actingAs($this->user);
+            Sanctum::actingAs($user);
 
             postJson(route('cart.item.store'), [
-                'product_id' => $this->product->id,
+                'product_id' => $product->id,
                 'quantity' => $addedQuantity,
             ])
                 ->assertOk()
@@ -218,99 +225,105 @@ describe('CartItemController -> store', function () {
             ]);
         });
 
-        it('does not change price snapshot when product price changes and quantity is updated', function () {
-            $userCart = Cart::factory()->for($this->user)->create();
+        it('preserves original price snapshot when product price changes', function () {
+            $user = User::factory()->create();
+            $originalPrice = '500.00';
+            $product = Product::factory()->create(['price' => $originalPrice]);
+            $userCart = Cart::factory()->for($user)->create();
             $userCartItem = CartItem::factory()->for($userCart)->create([
-                'product_id' => $this->product->id,
-                'price_snapshot' => $this->originalPrice,
+                'product_id' => $product->id,
+                'price_snapshot' => $product->price,
                 'quantity' => 1,
             ]);
 
-            $this->product->update(['price' => '700.00']);
+            $product->update(['price' => '700.00']);
 
-            Sanctum::actingAs($this->user);
+            Sanctum::actingAs($user);
 
             postJson(route('cart.item.store'), [
-                'product_id' => $this->product->id,
+                'product_id' => $product->id,
             ])
                 ->assertOk()
                 ->assertJsonPath('data.items.0.quantity', 2)
-                ->assertJsonPath('data.items.0.total_price', bcmul($this->originalPrice, 2, 2))
-                ->assertJsonPath('data.items.0.price_snapshot', $this->originalPrice)
+                ->assertJsonPath('data.items.0.total_price', bcmul($originalPrice, 2, 2))
+                ->assertJsonPath('data.items.0.price_snapshot', $originalPrice)
                 ->assertJsonPath('data.total_items', 2)
-                ->assertJsonPath('data.total_price', bcmul($this->originalPrice, 2, 2));
+                ->assertJsonPath('data.total_price', bcmul($originalPrice, 2, 2));
 
-            $userCartItem->refresh();
-
-            expect($userCartItem->price_snapshot)->toBe($this->originalPrice);
+            expect($userCartItem->refresh()->price_snapshot)->toBe($originalPrice);
         });
 
-        it('deletes an expired cart and creates a new one before adding the item', function () {
-            $expiredCart = Cart::factory()->for($this->user)->createQuietly(['expires_at' => now()->subDay()]);
+        it('replaces expired cart with new one when adding item', function () {
+            $user = User::factory()->create();
+            $product = Product::factory()->create();
+            $expiredCart = Cart::factory()->for($user)->expired()->create();
 
-            Sanctum::actingAs($this->user);
+            Sanctum::actingAs($user);
 
-            postJson(route('cart.item.store'), ['product_id' => $this->product->id])
+            postJson(route('cart.item.store'), ['product_id' => $product->id])
                 ->assertCreated();
 
             $this->assertDatabaseMissing('carts', [
                 'id' => $expiredCart->id,
             ]);
             $this->assertDatabaseHas('carts', [
-                'user_id' => $this->user->id,
+                'user_id' => $user->id,
             ]);
         });
 
         it('refreshes the cart expiration date when a new item is added', function () {
+            $user = User::factory()->create();
+            $product = Product::factory()->create();
             $initialExpiration = now()->addHour();
-            $userCart = Cart::factory()->for($this->user)->createQuietly(['expires_at' => $initialExpiration]);
+            $userCart = Cart::factory()->for($user)->createQuietly(['expires_at' => $initialExpiration]);
 
-            Sanctum::actingAs($this->user);
+            Sanctum::actingAs($user);
 
-            postJson(route('cart.item.store'), ['product_id' => $this->product->id])
+            postJson(route('cart.item.store'), ['product_id' => $product->id])
                 ->assertCreated();
 
-            $userCart->refresh();
-
-            expect($userCart->expires_at->gt($initialExpiration))->toBeTrue();
+            expect($userCart->refresh()->expires_at->gt($initialExpiration))->toBeTrue();
         });
 
         it('refreshes the cart expiration date when a new item is updated', function () {
+            $user = User::factory()->create();
+            $product = Product::factory()->create();
             $initialExpiration = now()->addHour();
-            $userCart = Cart::factory()->for($this->user)->createQuietly(['expires_at' => $initialExpiration]);
-            $userCartItem = CartItem::factory()->for($userCart)->create(['product_id' => $this->product->id]);
+            $userCart = Cart::factory()->for($user)->createQuietly(['expires_at' => $initialExpiration]);
+            $userCartItem = CartItem::factory()->for($userCart)->create(['product_id' => $product->id]);
 
-            Sanctum::actingAs($this->user);
+            Sanctum::actingAs($user);
 
-            postJson(route('cart.item.store'), ['product_id' => $this->product->id])
+            postJson(route('cart.item.store'), ['product_id' => $product->id])
                 ->assertOk();
 
-            $userCart->refresh();
-
-            expect($userCart->expires_at->gt($initialExpiration))->toBeTrue();
+            expect($userCart->refresh()->expires_at->gt($initialExpiration))->toBeTrue();
         });
 
-        it('caps the quantity to 99 when cumulative addition exceeds the limit', function () {
-            $userCart = Cart::factory()->for($this->user)->create();
+        it('caps quantity to maximum limit during cumulative addition', function () {
+            $user = User::factory()->create();
+            $product = Product::factory()->create();
+            $userCart = Cart::factory()->for($user)->create();
+            $max = config('cart.max_quantity');
             $userCartItem = CartItem::factory()->for($userCart)->create([
-                'product_id' => $this->product->id,
+                'product_id' => $product->id,
                 'quantity' => 90,
             ]);
 
-            Sanctum::actingAs($this->user);
+            Sanctum::actingAs($user);
 
             postJson(route('cart.item.store'), [
-                'product_id' => $this->product->id,
+                'product_id' => $product->id,
                 'quantity' => 20,
             ])
                 ->assertOk()
-                ->assertJsonPath('data.items.0.quantity', config('cart.max_quantity'));
+                ->assertJsonPath('data.items.0.quantity', $max);
 
             $this->assertDatabaseHas('cart_items', [
                 'id' => $userCartItem->id,
                 'cart_id' => $userCart->id,
                 'product_id' => $userCartItem->product_id,
-                'quantity' => config('cart.max_quantity'),
+                'quantity' => $max,
             ]);
         });
     });

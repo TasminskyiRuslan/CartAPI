@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Cart;
 
 use App\Actions\Cart\AddCartItemAction;
+use App\Actions\Cart\UpdateCartItemAction;
 use App\Data\Cart\Context\CartIdentifierData;
 use App\Data\Cart\Requests\CreateCartItemData;
 use App\Data\Cart\Requests\UpdateCartItemData;
@@ -67,7 +68,7 @@ class CartItemController extends Controller
      */
     public function store(CreateCartItemData $cartItemData, AddCartItemAction $addCartItemAction): JsonResponse
     {
-        $cartData = $addCartItemAction->handle(CartIdentifierData::fromRequest(request()), $cartItemData);
+        $cartData = $addCartItemAction->handle($cartItemData, CartIdentifierData::fromRequest(request()));
         return CartResource::make($cartData->cart->loadMissing('items.product'))
             ->response()
             ->setStatusCode($cartData->created ? SymfonyResponse::HTTP_CREATED : SymfonyResponse::HTTP_OK);
@@ -75,10 +76,19 @@ class CartItemController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @param UpdateCartItemData $cartItemData
+     * @param CartItem $item
+     * @param UpdateCartItemAction $updateCartItemAction
+     * @return JsonResponse
+     * @throws Throwable
      */
-    public function update(UpdateCartItemData $data, CartItem $item)
+    public function update(UpdateCartItemData $cartItemData, CartItem $item, UpdateCartItemAction $updateCartItemAction): JsonResponse
     {
-        //
+        $updateCartItemAction->handle($cartItemData, $item);
+        return CartResource::make($item->cart->loadMissing('items.product'))
+            ->response()
+            ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 
     /**

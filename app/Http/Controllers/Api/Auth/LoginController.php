@@ -44,13 +44,13 @@ class LoginController extends Controller
     /**
      * Handle the user login request.
      *
-     * @param LoginUserData $data
-     * @param LoginUserAction $action
+     * @param LoginUserData $userData
+     * @param LoginUserAction $loginUserAction
      * @return JsonResponse
      */
-    public function __invoke(LoginUserData $data, LoginUserAction $action): JsonResponse
+    public function __invoke(LoginUserData $userData, LoginUserAction $loginUserAction): JsonResponse
     {
-        $authData = $action->handle($data);
+        $authData = $loginUserAction->handle($userData);
 
         return AuthResource::make($authData)
             ->response()

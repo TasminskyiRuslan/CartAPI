@@ -43,8 +43,12 @@ Route::prefix('cart')->group(callback: function () {
         ->name('cart.destroy');
 
     Route::prefix('items')->group(callback: function () {
-        // Cart item destroy action
+        // Cart item store action
         Route::post('/', [CartItemController::class, 'store'])
             ->name('cart.item.store');
+
+        // Cart item update action
+        Route::patch('/{item}', [CartItemController::class, 'update'])
+            ->name('cart.item.update')->scopeBindings();
     });
 })->scopeBindings();

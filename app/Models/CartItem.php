@@ -64,6 +64,27 @@ class CartItem extends Model
     }
 
     /**
+     * Retrieve the model for a bound value.
+     *
+     * @param mixed $value
+     * @param string|null $field
+     * @return Model|null
+     */
+    public function resolveRouteBinding($value, $field = null): ?Model
+    {
+        return $this->where($field ?? $this->getRouteKeyName(), $value)
+            ->whereHas('cart', function (Builder $query) {
+                $query->active();
+                if (auth()->check()) {
+                    $query->where('user_id', auth()->id());
+                } else {
+                    $query->where('guest_token', request()->header(config('cart.guest_header')));
+                }
+            })
+            ->firstOrFail();
+    }
+
+    /**
      * Get the product associated with the cart item.
      *
      * @return BelongsTo<Product, CartItem>

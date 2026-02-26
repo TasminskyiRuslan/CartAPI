@@ -23,15 +23,15 @@ class LoginUserAction
     /**
      * Authenticate user and issue token.
      *
-     * @param LoginUserData $data
+     * @param LoginUserData $userData
      * @return AuthData
      * @throws ValidationException
      */
-    public function handle(LoginUserData $data): AuthData
+    public function handle(LoginUserData $userData): AuthData
     {
-        $user = User::where('email', $data->email)->first();
+        $user = User::where('email', $userData->email)->first();
 
-        if (!$user || !Hash::check($data->password, $user->password)) {
+        if (!$user || !Hash::check($userData->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['auth.failed'],
             ]);
