@@ -2,7 +2,7 @@
 
 namespace App\Actions\Cart;
 
-use App\Data\Cart\CartIdentifierData;
+use App\Data\Cart\Context\CartIdentifierData;
 use App\Models\Cart;
 use Illuminate\Support\Facades\DB;
 use Throwable;

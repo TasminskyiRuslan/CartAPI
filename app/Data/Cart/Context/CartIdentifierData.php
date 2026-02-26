@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Data\Cart;
+namespace App\Data\Cart\Context;
 
 use App\Models\User;
 use Illuminate\Http\Request;

@@ -2,9 +2,9 @@
 
 namespace App\Actions\Cart;
 
-use App\Data\Cart\AddCartItemResultData;
-use App\Data\Cart\CartIdentifierData;
+use App\Data\Cart\Context\CartIdentifierData;
 use App\Data\Cart\Requests\CreateCartItemData;
+use App\Data\Cart\Results\AddCartItemData;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -23,10 +23,10 @@ class AddCartItemAction
      *
      * @param CartIdentifierData $identifierData
      * @param CreateCartItemData $itemData
-     * @return AddCartItemResultData
+     * @return AddCartItemData
      * @throws Throwable
      */
-    public function handle(CartIdentifierData $identifierData, CreateCartItemData $itemData): AddCartItemResultData
+    public function handle(CartIdentifierData $identifierData, CreateCartItemData $itemData): AddCartItemData
     {
         return DB::transaction(function () use ($identifierData, $itemData) {
             $cart = $this->resolveCartAction->handle($identifierData);
@@ -46,7 +46,7 @@ class AddCartItemAction
             $item->save();
             $cart->refreshExpiration()->save();
 
-            return new AddCartItemResultData(
+            return new AddCartItemData(
                 cart: $cart,
                 created: $created
             );

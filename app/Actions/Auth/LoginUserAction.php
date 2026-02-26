@@ -2,8 +2,8 @@
 
 namespace App\Actions\Auth;
 
-use App\Data\Auth\AuthResultData;
 use App\Data\Auth\Requests\LoginUserData;
+use App\Data\Auth\Results\AuthData;
 use App\Models\User;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Hash;
@@ -24,10 +24,10 @@ class LoginUserAction
      * Authenticate user and issue token.
      *
      * @param LoginUserData $data
-     * @return AuthResultData
+     * @return AuthData
      * @throws ValidationException
      */
-    public function handle(LoginUserData $data): AuthResultData
+    public function handle(LoginUserData $data): AuthData
     {
         $user = User::where('email', $data->email)->first();
 
@@ -41,7 +41,7 @@ class LoginUserAction
 
         event(new Login(config('auth.defaults.guard'), $user, false));
 
-        return new AuthResultData(
+        return new AuthData(
             user: $user,
             token: $token,
         );

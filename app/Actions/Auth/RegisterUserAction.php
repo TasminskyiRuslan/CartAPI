@@ -2,8 +2,8 @@
 
 namespace App\Actions\Auth;
 
-use App\Data\Auth\AuthResultData;
 use App\Data\Auth\Requests\RegisterUserData;
+use App\Data\Auth\Results\AuthData;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\DB;
@@ -24,10 +24,10 @@ class RegisterUserAction
      * Register a new user within a transaction.
      *
      * @param RegisterUserData $data
-     * @return AuthResultData
+     * @return AuthData
      * @throws Throwable
      */
-    public function handle(RegisterUserData $data): AuthResultData
+    public function handle(RegisterUserData $data): AuthData
     {
         return DB::transaction(function () use ($data) {
             $user = User::create($data->toArray());
@@ -35,7 +35,7 @@ class RegisterUserAction
 
             event(new Registered($user));
 
-            return new AuthResultData(
+            return new AuthData(
                 user: $user,
                 token: $token,
             );

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Data\Cart\CartIdentifierData;
+use App\Data\Cart\Context\CartIdentifierData;
 use Database\Factories\CartFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;

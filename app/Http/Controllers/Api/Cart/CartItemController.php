@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Api\Cart;
 
 use App\Actions\Cart\AddCartItemAction;
-use App\Data\Cart\CartIdentifierData;
+use App\Data\Cart\Context\CartIdentifierData;
 use App\Data\Cart\Requests\CreateCartItemData;
 use App\Data\Cart\Requests\UpdateCartItemData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Cart\CartResource;
 use App\Models\CartItem;
 use Illuminate\Http\JsonResponse;
+use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Throwable;
-use OpenApi\Attributes as OA;
 
 class CartItemController extends Controller
 {

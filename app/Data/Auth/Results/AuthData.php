@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Data\Auth;
+namespace App\Data\Auth\Results;
 
 use App\Models\User;
 use Spatie\LaravelData\Data;
 
-class AuthResultData extends Data
+class AuthData extends Data
 {
     /**
      * @param User $user
