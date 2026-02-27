@@ -55,7 +55,7 @@ class CartController extends Controller
         path: '/cart',
         description: 'Deletes the active cart for the authenticated user or guest.',
         summary: 'Delete current cart',
-        security: [['sanctum' => []], ['guest_token' => []], []],
+        security: [['sanctum' => []], ['guest_token' => []]],
         tags: ['Cart'],
         responses: [
             new OA\Response(

@@ -21,7 +21,7 @@ class CartItemController extends Controller
         path: '/cart/items',
         description: 'Adds a product to the cart or increases its quantity if it already exists.',
         summary: 'Add item to cart',
-        security: [['sanctum' => []], ['guest_token' => []], []],
+        security: [['sanctum' => []], ['guest_token' => []]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(ref: '#/components/schemas/CreateCartItemRequest')

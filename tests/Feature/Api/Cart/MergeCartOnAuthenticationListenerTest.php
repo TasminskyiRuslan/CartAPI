@@ -17,7 +17,7 @@ describe('MergeCartOnAuthenticationListener', function () {
 
     it('triggers merge action when guest token is present', function () {
         $guestToken = Str::uuid()->toString();
-        request()->headers->set(config('cart.guest_header'), $guestToken);
+        request()->headers->set(config('cart.guest_token_header'), $guestToken);
 
         $user = User::factory()->create();
         $this->mock(MergeCartAction::class)->shouldReceive('handle')->once()->with($user->id, $guestToken);

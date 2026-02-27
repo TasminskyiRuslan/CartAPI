@@ -27,7 +27,7 @@ class MergeCartOnAuthenticationListener
      */
     public function handle(Login|Registered $event): void
     {
-        $guestToken = request()->header(config('cart.guest_header'));
+        $guestToken = request()->header(config('cart.guest_token_header'));
 
         if (!$guestToken) {
             return;

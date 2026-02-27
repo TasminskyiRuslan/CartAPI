@@ -26,8 +26,8 @@ class CartIdentifierData extends Data
     public static function fromRequest(Request $request): self
     {
         return new self(
-            user: $request->user(),
-            guestToken: $request->header(config('cart.guest_header'))
+            user: auth()->user(),
+            guestToken: $request->header(config('cart.guest_token_header'))
         );
     }
 }

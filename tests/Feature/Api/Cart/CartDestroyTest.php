@@ -13,6 +13,20 @@ describe('CartController -> destroy', function () {
 
     /*
     |--------------------------------------------------------------------------
+    | validation
+    |--------------------------------------------------------------------------
+    */
+    describe('success', function () {
+        it('fails when no user and no guest token', function () {
+
+            deleteJson(route('cart.destroy'))
+                ->assertUnauthorized()
+                ->assertJson(['message' => __('cart.errors.identification_missing')]);
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
     | success
     |--------------------------------------------------------------------------
     */
@@ -40,7 +54,7 @@ describe('CartController -> destroy', function () {
             $guestCart = Cart::factory()->guest()->create();
             CartItem::factory()->count(2)->for($guestCart)->create();
 
-            deleteJson(route('cart.destroy'), [], [config('cart.guest_header') => $guestCart->guest_token])
+            deleteJson(route('cart.destroy'), [], [config('cart.guest_token_header') => $guestCart->guest_token])
                 ->assertNoContent();
 
             $this->assertDatabaseMissing('carts', [
@@ -61,12 +75,7 @@ describe('CartController -> destroy', function () {
         });
 
         it('returns no content when guest cart does not exist', function () {
-            deleteJson(route('cart.destroy'), [], [config('cart.guest_header') => Str::uuid()->toString()])
-                ->assertNoContent();
-        });
-
-        it('returns no content if no authentication and no guest token provided', function () {
-            deleteJson(route('cart.destroy'))
+            deleteJson(route('cart.destroy'), [], [config('cart.guest_token_header') => Str::uuid()->toString()])
                 ->assertNoContent();
         });
 
@@ -97,7 +106,7 @@ describe('CartController -> destroy', function () {
             $userCart = Cart::factory()->for($user)->create();
             $guestCart = Cart::factory()->guest()->create();
 
-            deleteJson(route('cart.destroy'), [], [config('cart.guest_header') => $guestCart->guest_token])
+            deleteJson(route('cart.destroy'), [], [config('cart.guest_token_header') => $guestCart->guest_token])
                 ->assertNoContent();
 
             $this->assertDatabaseMissing('carts', [

@@ -39,12 +39,11 @@ class MeController extends Controller
     /**
      * Retrieve the currently authenticated user.
      *
-     * @param Request $request
      * @return JsonResponse
      */
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(): JsonResponse
     {
-        return UserResource::make($request->user())
+        return UserResource::make(auth()->user())
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }

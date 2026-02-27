@@ -116,7 +116,7 @@ describe('CartItemController -> update', function () {
 
             patchJson(route('cart.item.update', $anotherCartItem), [
                 'quantity' => 50
-            ], [config('cart.guest_header') => $guestCart->guest_token])
+            ], [config('cart.guest_token_header') => $guestCart->guest_token])
                 ->assertNotFound();
         });
     });
@@ -161,7 +161,7 @@ describe('CartItemController -> update', function () {
 
             patchJson(route('cart.item.update', $guestCartItem), [
                 'quantity' => $quantity
-            ], [config('cart.guest_header') => $guestCart->guest_token])
+            ], [config('cart.guest_token_header') => $guestCart->guest_token])
                 ->assertOk()
                 ->assertJsonStructure(['data' => cartJsonStructure()])
                 ->assertJsonPath('data.items.0.quantity', $quantity)

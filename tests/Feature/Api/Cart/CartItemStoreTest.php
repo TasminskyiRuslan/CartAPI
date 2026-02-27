@@ -20,13 +20,13 @@ describe('CartItemController -> store', function () {
     describe('validation', function () {
 
         it('fails when required fields are missing', function () {
-            postJson(route('cart.item.store'), [])
+            postJson(route('cart.item.store'), [], [config('cart.guest_token_header') => Str::uuid()->toString()])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['product_id']);
         });
 
         it('fails when product does not exist', function () {
-            postJson(route('cart.item.store'), ['product_id' => 99999])
+            postJson(route('cart.item.store'), ['product_id' => 99999], [config('cart.guest_token_header') => Str::uuid()->toString()])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['product_id']);
         });
@@ -37,7 +37,7 @@ describe('CartItemController -> store', function () {
             postJson(route('cart.item.store'), [
                 'product_id' => $product->id,
                 'quantity' => 0,
-            ])
+            ], [config('cart.guest_token_header') => Str::uuid()->toString()])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['quantity']);
         });
@@ -48,7 +48,7 @@ describe('CartItemController -> store', function () {
             postJson(route('cart.item.store'), [
                 'product_id' => $product->id,
                 'quantity' => 'invalid',
-            ])
+            ], [config('cart.guest_token_header') => Str::uuid()->toString()])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['quantity']);
         });
@@ -60,9 +60,17 @@ describe('CartItemController -> store', function () {
             postJson(route('cart.item.store'), [
                 'product_id' => $product->id,
                 'quantity' => $max + 1,
-            ])
+            ], [config('cart.guest_token_header') => Str::uuid()->toString()])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['quantity']);
+        });
+
+        it('fails when no user and no guest token', function () {
+            $product = Product::factory()->create();
+
+            postJson(route('cart.item.store'), ['product_id' => $product->id])
+                ->assertUnauthorized()
+                ->assertJson(['message' => __('cart.errors.identification_missing')]);
         });
     });
 
@@ -131,7 +139,7 @@ describe('CartItemController -> store', function () {
             postJson(route('cart.item.store'), [
                 'product_id' => $product->id,
                 'quantity' => $quantity,
-            ], [config('cart.guest_header') => $guestToken])
+            ], [config('cart.guest_token_header') => $guestToken])
                 ->assertCreated()
                 ->assertJsonStructure(['data' => cartJsonStructure()])
                 ->assertJsonPath('data.items.0.price_snapshot', $product->price)
@@ -182,7 +190,7 @@ describe('CartItemController -> store', function () {
             postJson(route('cart.item.store'), [
                 'product_id' => $product->id,
                 'quantity' => $quantity,
-            ], [config('cart.guest_header') => $guestCart->guest_token])
+            ], [config('cart.guest_token_header') => $guestCart->guest_token])
                 ->assertCreated();
 
             $this->assertDatabaseHas('cart_items', [

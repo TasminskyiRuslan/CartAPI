@@ -31,13 +31,12 @@ class LogoutController extends Controller
     /**
      * Logout the authenticated user by revoking the current access token.
      *
-     * @param Request $request
      * @param RevokeCurrentTokenAction $revokeCurrentTokenAction
      * @return Response
      */
-    public function __invoke(Request $request, RevokeCurrentTokenAction $revokeCurrentTokenAction): Response
+    public function __invoke(RevokeCurrentTokenAction $revokeCurrentTokenAction): Response
     {
-        $revokeCurrentTokenAction->handle($request->user());
+        $revokeCurrentTokenAction->handle(auth()->user());
         return response()->noContent();
     }
 }

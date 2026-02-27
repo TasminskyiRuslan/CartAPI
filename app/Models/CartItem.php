@@ -78,7 +78,7 @@ class CartItem extends Model
                 if (auth()->check()) {
                     $query->where('user_id', auth()->id());
                 } else {
-                    $query->where('guest_token', request()->header(config('cart.guest_header')));
+                    $query->where('guest_token', request()->header(config('cart.guest_token_header')));
                 }
             })
             ->firstOrFail();

@@ -23,7 +23,7 @@ class CartItemFactory extends Factory
             'cart_id' => Cart::factory(),
             'product_id' => Product::factory(),
             'price_snapshot' => null,
-            'quantity' => fake()->numberBetween(1, 15),
+            'quantity' => fake()->numberBetween(1, config('cart.max_quantity')),
         ];
     }
 

@@ -33,7 +33,7 @@ Route::prefix('auth')->group(callback: function () {
         ->name('auth.logout');
 });
 
-Route::prefix('cart')->group(callback: function () {
+Route::middleware('check.cart.owner')->prefix('cart')->group(callback: function () {
     // Cart index action
     Route::get('/', [CartController::class, 'index'])
         ->name('cart.index');
@@ -49,6 +49,7 @@ Route::prefix('cart')->group(callback: function () {
 
         // Cart item update action
         Route::patch('/{item}', [CartItemController::class, 'update'])
-            ->name('cart.item.update')->scopeBindings();
+            ->name('cart.item.update');
     });
-})->scopeBindings();
+})
+    ->scopeBindings();

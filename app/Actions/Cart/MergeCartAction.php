@@ -53,6 +53,7 @@ class MergeCartAction
             }
 
             $userCart->refreshExpiration()->save();
+            $guestCart->refresh();
             $guestCart->delete();
         });
     }
