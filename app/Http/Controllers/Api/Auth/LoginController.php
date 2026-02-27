@@ -14,8 +14,8 @@ class LoginController extends Controller
 {
     #[OA\Post(
         path: '/auth/login',
-        description: 'Authenticate user.',
-        summary: 'Login',
+        description: 'Authenticate a user using email and password and issue an access token.',
+        summary: 'Authenticate user',
         security: [['guest_token' => []], []],
         requestBody: new OA\RequestBody(
             required: true,
@@ -25,24 +25,24 @@ class LoginController extends Controller
         responses: [
             new OA\Response(
                 response: SymfonyResponse::HTTP_OK,
-                description: 'User logged in.',
+                description: 'User authenticated successfully.',
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(
                             property: 'data',
-                            ref: '#/components/schemas/Auth'
+                            ref: '#/components/schemas/AuthResponse'
                         )
                     ]
                 )
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
-                description: 'Validation error.'
+                description: 'Invalid credentials or validation error.'
             ),
         ]
     )]
     /**
-     * Handle the user login request.
+     * Authenticate a user and return an access token.
      *
      * @param LoginUserData $userData
      * @param LoginUserAction $loginUserAction
@@ -51,7 +51,6 @@ class LoginController extends Controller
     public function __invoke(LoginUserData $userData, LoginUserAction $loginUserAction): JsonResponse
     {
         $authData = $loginUserAction->handle($userData);
-
         return AuthResource::make($authData)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);

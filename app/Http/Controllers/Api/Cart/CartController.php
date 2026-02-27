@@ -17,19 +17,19 @@ class CartController extends Controller
 {
     #[OA\Get(
         path: '/cart',
-        description: 'Get the current cart for the user.',
+        description: 'Returns the active cart for the authenticated user or guest.',
         summary: 'Get current cart',
         security: [['sanctum' => []], ['guest_token' => []], []],
         tags: ['Cart'],
         responses: [
             new OA\Response(
                 response: SymfonyResponse::HTTP_OK,
-                description: 'The cart data returned.',
+                description: 'Cart retrieved successfully.',
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(
                             property: 'data',
-                            ref: '#/components/schemas/Cart'
+                            ref: '#/components/schemas/CartResponse'
                         )
                     ]
                 )
@@ -37,7 +37,7 @@ class CartController extends Controller
         ]
     )]
     /**
-     * Get the current cart.
+     * Retrieve the current active cart.
      *
      * @param Request $request
      * @param FindCartAction $findCartAction
@@ -46,7 +46,6 @@ class CartController extends Controller
     public function index(Request $request, FindCartAction $findCartAction): JsonResponse
     {
         $cart = $findCartAction->handle(CartIdentifierData::fromRequest($request));
-
         return CartResource::make($cart?->loadMissing('items.product'))
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_OK);
@@ -54,7 +53,7 @@ class CartController extends Controller
 
     #[OA\Delete(
         path: '/cart',
-        description: 'Delete the current cart for the user.',
+        description: 'Deletes the active cart for the authenticated user or guest.',
         summary: 'Delete current cart',
         security: [['sanctum' => []], ['guest_token' => []], []],
         tags: ['Cart'],
@@ -66,7 +65,7 @@ class CartController extends Controller
         ]
     )]
     /**
-     * Delete the current cart.
+     * Delete the current active cart.
      *
      * @param Request $request
      * @param DeleteCartAction $deleteCartAction

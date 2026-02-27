@@ -5,9 +5,9 @@ namespace App\Swagger\Schemas\Cart;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
-    schema: 'Product',
-    title: 'Product Schema',
-    description: 'Details of a product returned by the API.',
+    schema: 'ProductResponse',
+    title: 'Product Response',
+    description: 'Data for a product.',
     required: ['id', 'name', 'price'],
     properties: [
         new OA\Property(
@@ -47,7 +47,7 @@ use OpenApi\Attributes as OA;
     ],
     type: 'object'
 )]
-class ProductSchema
+class ProductResponseSchema
 {
 
 }

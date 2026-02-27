@@ -5,40 +5,40 @@ namespace App\Swagger\Schemas\Cart;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
-    schema: 'Cart',
-    title: 'Cart schema',
-    description: 'The cart data returned by the API.',
+    schema: 'CartResponse',
+    title: 'Cart Response',
+    description: 'Data for a user cart.',
     required: ['id', 'items', 'total_price', 'total_count'],
     properties: [
         new OA\Property(
             property: 'id',
-            description: 'The cart ID.',
+            description: 'Unique identifier of the cart.',
             type: 'integer',
             example: 1
         ),
         new OA\Property(
             property: 'items',
-            description: 'The cart items.',
+            description: 'List of items in the cart.',
             type: 'array',
-            items: new OA\Items(ref: '#/components/schemas/CartItem')
+            items: new OA\Items(ref: '#/components/schemas/CartItemResponse')
         ),
         new OA\Property(
             property: 'total_price',
-            description: 'The total price of the cart.',
+            description: 'Total price of all items in the cart.',
             type: 'string',
             format: 'float',
             example: 1999.98
         ),
         new OA\Property(
             property: 'total_count',
-            description: 'The total count of the cart.',
+            description: 'Total number of items in the cart.',
             type: 'integer',
             example: 2
         ),
     ],
     type: 'object'
 )]
-class CartSchema
+class CartResponseSchema
 {
 
 }

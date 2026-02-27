@@ -5,27 +5,28 @@ namespace App\Swagger\Requests\Cart;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
-    schema: 'CreateItemRequest',
-    title: 'Create Item Request Schema',
-    description: 'Schema for cart item creation via API request.',
+    schema: 'CreateCartItemRequest',
+    title: 'Create Cart Item Request',
+    description: 'Request payload for adding a product to the cart.',
     required: ['product_id'],
     properties: [
         new OA\Property(
             property: 'product_id',
-            description: 'The product ID.',
+            description: 'ID of the product to add.',
             type: 'integer',
             example: 1
         ),
         new OA\Property(
             property: 'quantity',
-            description: 'The product quantity.',
+            description: 'Quantity of the product.',
             type: 'integer',
+            maximum: 99,
             minimum: 1,
             example: 2
         ),
     ],
     type: 'object'
 )]
-class CreateCartRequestSchema
+class CreateCartItemRequestSchema
 {
 }

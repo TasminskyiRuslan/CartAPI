@@ -8,7 +8,7 @@ use App\Models\Cart;
 class DeleteCartAction
 {
     /**
-     * Delete the cart identified by the given identifier data.
+     * Delete the active cart for the given identifier.
      *
      * @param CartIdentifierData $identifierData
      * @return void

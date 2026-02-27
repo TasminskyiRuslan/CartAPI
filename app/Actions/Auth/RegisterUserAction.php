@@ -21,7 +21,7 @@ class RegisterUserAction
     }
 
     /**
-     * Register a new user within a transaction.
+     * Create a new user account and issue an access token.
      *
      * @param RegisterUserData $userData
      * @return AuthData

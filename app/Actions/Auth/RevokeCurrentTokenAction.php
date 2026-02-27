@@ -4,10 +4,10 @@ namespace App\Actions\Auth;
 
 use App\Models\User;
 
-class LogoutUserAction
+class RevokeCurrentTokenAction
 {
     /**
-     * Revoke the current access token.
+     * Revoke the current access token for the user.
      *
      * @param User $user
      * @return void

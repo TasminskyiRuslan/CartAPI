@@ -19,7 +19,7 @@ class AddCartItemAction
     ) {}
 
     /**
-     * Add a product to the cart or update its quantity and refresh cart expiration.
+     * Add a product to the cart or increase its quantity.
      *
      * @param CartIdentifierData $identifierData
      * @param CreateCartItemData $itemData

@@ -15,8 +15,8 @@ class RegisterController extends Controller
 {
     #[OA\Post(
         path: '/auth/register',
-        description: 'Register a new user.',
-        summary: 'Register',
+        description: 'Register a new user and issue an access token.',
+        summary: 'Register user',
         security: [['guest_token' => []], []],
         requestBody: new OA\RequestBody(
             required: true,
@@ -26,12 +26,12 @@ class RegisterController extends Controller
         responses: [
             new OA\Response(
                 response: SymfonyResponse::HTTP_CREATED,
-                description: 'User registered.',
+                description: 'User registered successfully.',
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(
                             property: 'data',
-                            ref: '#/components/schemas/Auth'
+                            ref: '#/components/schemas/AuthResponse'
                         )
                     ]
                 )
@@ -43,7 +43,7 @@ class RegisterController extends Controller
         ]
     )]
     /**
-     * Handle the user registration request.
+     * Register a new user and return authentication data.
      *
      * @param RegisterUserData $userData
      * @param RegisterUserAction $registerUserAction
@@ -53,7 +53,6 @@ class RegisterController extends Controller
     public function __invoke(RegisterUserData $userData, RegisterUserAction $registerUserAction): JsonResponse
     {
         $authData = $registerUserAction->handle($userData);
-
         return AuthResource::make($authData)
             ->response()
             ->setStatusCode(SymfonyResponse::HTTP_CREATED);

@@ -8,7 +8,7 @@ use App\Models\Cart;
 class FindCartAction
 {
     /**
-     * Find the active cart for the given identifier data.
+     * Retrieve the active cart for the given identifier.
      *
      * @param CartIdentifierData $identifierData
      * @return Cart|null

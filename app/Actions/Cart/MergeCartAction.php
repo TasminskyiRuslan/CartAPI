@@ -9,7 +9,11 @@ use Throwable;
 class MergeCartAction
 {
     /**
-     * Merge a guest cart into an authenticated user's cart.
+     * Merge a guest cart into the user's active cart.
+     *
+     * If the guest cart is expired, it will be deleted.
+     * If the user has no active cart (or it is expired), the guest cart will be assigned to the user.
+     * Otherwise, cart items will be merged with quantity limits applied.
      *
      * @param int $userId
      * @param string $guestToken

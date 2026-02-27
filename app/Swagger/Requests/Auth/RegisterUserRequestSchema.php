@@ -6,20 +6,20 @@ use OpenApi\Attributes as OA;
 
 #[OA\Schema(
     schema: 'RegisterUserRequest',
-    title: 'Register User Request Schema',
-    description: 'Schema for user registration via API request.',
+    title: 'Register User Request',
+    description: 'Request payload for registering a new user.',
     required: ['name', 'email', 'password', 'password_confirmation'],
     properties: [
         new OA\Property(
             property: 'name',
-            description: 'Name of the user.',
+            description: 'Full name of the user.',
             type: 'string',
             maxLength: 100,
             example: 'John Doe'
         ),
         new OA\Property(
             property: 'email',
-            description: 'Email of the user.',
+            description: 'User email address.',
             type: 'string',
             format: 'email',
             maxLength: 255,
@@ -27,7 +27,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'password',
-            description: 'Password of the user.',
+            description: 'User account password.',
             type: 'string',
             format: 'password',
             minLength: 8,
@@ -35,7 +35,7 @@ use OpenApi\Attributes as OA;
         ),
         new OA\Property(
             property: 'password_confirmation',
-            description: 'Password Confirmation of the user.',
+            description: 'Password confirmation (must match password).',
             type: 'string',
             format: 'password',
             minLength: 8,

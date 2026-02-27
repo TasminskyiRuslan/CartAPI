@@ -10,7 +10,9 @@ use Throwable;
 class ResolveCartAction
 {
     /**
-     * Resolve the active cart for the given identifier, creating a new one if it doesn't exist or is expired.
+     * Retrieve the active cart for the given identifier.
+     *
+     * If no cart exists or the existing cart is expired, a new cart will be created.
      *
      * @param CartIdentifierData $identifierData
      * @return Cart

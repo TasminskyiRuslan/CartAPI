@@ -17,8 +17,8 @@
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Login",
-                "description": "Authenticate user.",
+                "summary": "Authenticate user",
+                "description": "Authenticate a user using email and password and issue an access token.",
                 "operationId": "8e026335d25c3df3f6f6cf1f683ac7b8",
                 "requestBody": {
                     "required": true,
@@ -32,13 +32,13 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "User logged in.",
+                        "description": "User authenticated successfully.",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/Auth"
+                                            "$ref": "#/components/schemas/AuthResponse"
                                         }
                                     },
                                     "type": "object"
@@ -47,7 +47,7 @@
                         }
                     },
                     "422": {
-                        "description": "Validation error."
+                        "description": "Invalid credentials or validation error."
                     }
                 },
                 "security": [
@@ -63,15 +63,15 @@
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Logout current device",
-                "description": "Revoke the authentication token for the authenticated user.",
+                "summary": "Logout user",
+                "description": "Revoke the current access token for the authenticated user.",
                 "operationId": "23a3ec5e2e8d20c9fd2ea568ae96fcd3",
                 "responses": {
                     "204": {
-                        "description": "User logged out."
+                        "description": "User logged out successfully."
                     },
                     "401": {
-                        "description": "Unauthorized."
+                        "description": "Unauthenticated."
                     }
                 },
                 "security": [
@@ -86,18 +86,18 @@
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Get authenticated user",
-                "description": "Get the authenticated user's data.",
+                "summary": "Get current user",
+                "description": "Return the currently authenticated user.",
                 "operationId": "a27984a716a6787c8b8537aee958673c",
                 "responses": {
                     "200": {
-                        "description": "Authenticated user data.",
+                        "description": "User retrieved successfully.",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/User"
+                                            "$ref": "#/components/schemas/UserResponse"
                                         }
                                     },
                                     "type": "object"
@@ -106,7 +106,7 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthorized."
+                        "description": "Unauthenticated."
                     }
                 },
                 "security": [
@@ -121,8 +121,8 @@
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Register",
-                "description": "Register a new user.",
+                "summary": "Register user",
+                "description": "Register a new user and issue an access token.",
                 "operationId": "8e69ddc577b1650c4a010f798dd6c9d3",
                 "requestBody": {
                     "required": true,
@@ -136,13 +136,13 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "User registered.",
+                        "description": "User registered successfully.",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/Auth"
+                                            "$ref": "#/components/schemas/AuthResponse"
                                         }
                                     },
                                     "type": "object"
@@ -168,17 +168,17 @@
                     "Cart"
                 ],
                 "summary": "Get current cart",
-                "description": "Get the current cart for the user.",
+                "description": "Returns the active cart for the authenticated user or guest.",
                 "operationId": "8f16b385b0bec46faad2136254a7ef52",
                 "responses": {
                     "200": {
-                        "description": "The cart data returned.",
+                        "description": "Cart retrieved successfully.",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/Cart"
+                                            "$ref": "#/components/schemas/CartResponse"
                                         }
                                     },
                                     "type": "object"
@@ -202,7 +202,7 @@
                     "Cart"
                 ],
                 "summary": "Delete current cart",
-                "description": "Delete the current cart for the user.",
+                "description": "Deletes the active cart for the authenticated user or guest.",
                 "operationId": "87ae7ca34713e7228f1422e3cafa31c5",
                 "responses": {
                     "204": {
@@ -225,28 +225,28 @@
                 "tags": [
                     "Cart"
                 ],
-                "summary": "Add or update cart item",
-                "description": "Adds a product to the cart.",
+                "summary": "Add item to cart",
+                "description": "Adds a product to the cart or increases its quantity if it already exists.",
                 "operationId": "d6674e21902278d2c2b278acd30ccb91",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/CreateItemRequest"
+                                "$ref": "#/components/schemas/CreateCartItemRequest"
                             }
                         }
                     }
                 },
                 "responses": {
                     "201": {
-                        "description": "Cart item created.",
+                        "description": "Item added to cart.",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/Cart"
+                                            "$ref": "#/components/schemas/CartResponse"
                                         }
                                     },
                                     "type": "object"
@@ -255,13 +255,13 @@
                         }
                     },
                     "200": {
-                        "description": "Cart item quantity updated.",
+                        "description": "Item quantity increased.",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/Cart"
+                                            "$ref": "#/components/schemas/CartResponse"
                                         }
                                     },
                                     "type": "object"
@@ -283,27 +283,89 @@
                     {}
                 ]
             }
+        },
+        "/cart/items/{item}": {
+            "patch": {
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Update cart item quantity",
+                "description": "Updates the quantity of a specific cart item.",
+                "operationId": "15ea169f0896ec8b11469b74103458ab",
+                "parameters": [
+                    {
+                        "name": "item",
+                        "in": "path",
+                        "description": "Cart item identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateCartItemRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Item quantity updated.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CartResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Cart item not found."
+                    },
+                    "422": {
+                        "description": "Validation error."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    },
+                    {
+                        "guest_token": []
+                    }
+                ]
+            }
         }
     },
     "components": {
         "schemas": {
             "LoginUserRequest": {
-                "title": "Login User Request Schema",
-                "description": "Schema for user login via API request.",
+                "title": "Login User Request",
+                "description": "Request payload for authenticating a user.",
                 "required": [
                     "email",
                     "password"
                 ],
                 "properties": {
                     "email": {
-                        "description": "Email of the user.",
+                        "description": "User email address.",
                         "type": "string",
                         "format": "email",
                         "maxLength": 255,
                         "example": "john@example.com"
                     },
                     "password": {
-                        "description": "Password of the user.",
+                        "description": "User account password.",
                         "type": "string",
                         "format": "password",
                         "example": "password123"
@@ -312,8 +374,8 @@
                 "type": "object"
             },
             "RegisterUserRequest": {
-                "title": "Register User Request Schema",
-                "description": "Schema for user registration via API request.",
+                "title": "Register User Request",
+                "description": "Request payload for registering a new user.",
                 "required": [
                     "name",
                     "email",
@@ -322,27 +384,27 @@
                 ],
                 "properties": {
                     "name": {
-                        "description": "Name of the user.",
+                        "description": "Full name of the user.",
                         "type": "string",
                         "maxLength": 100,
                         "example": "John Doe"
                     },
                     "email": {
-                        "description": "Email of the user.",
+                        "description": "User email address.",
                         "type": "string",
                         "format": "email",
                         "maxLength": 255,
                         "example": "john@example.com"
                     },
                     "password": {
-                        "description": "Password of the user.",
+                        "description": "User account password.",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
                         "example": "password123"
                     },
                     "password_confirmation": {
-                        "description": "Password Confirmation of the user.",
+                        "description": "Password confirmation (must match password).",
                         "type": "string",
                         "format": "password",
                         "minLength": 8,
@@ -351,30 +413,48 @@
                 },
                 "type": "object"
             },
-            "CreateItemRequest": {
-                "title": "Create Item Request Schema",
-                "description": "Schema for cart item creation via API request.",
+            "CreateCartItemRequest": {
+                "title": "Create Cart Item Request",
+                "description": "Request payload for adding a product to the cart.",
                 "required": [
                     "product_id"
                 ],
                 "properties": {
                     "product_id": {
-                        "description": "The product ID.",
+                        "description": "ID of the product to add.",
                         "type": "integer",
                         "example": 1
                     },
                     "quantity": {
-                        "description": "The product quantity.",
+                        "description": "Quantity of the product.",
                         "type": "integer",
+                        "maximum": 99,
                         "minimum": 1,
                         "example": 2
                     }
                 },
                 "type": "object"
             },
-            "Auth": {
-                "title": "Auth Schema",
-                "description": "Authentication data returned by the API.",
+            "UpdateCartItemRequest": {
+                "title": "Update Cart Item Request",
+                "description": "Request payload for updating a product quantity in the cart.",
+                "required": [
+                    "quantity"
+                ],
+                "properties": {
+                    "quantity": {
+                        "description": "New quantity of the product.",
+                        "type": "integer",
+                        "maximum": 99,
+                        "minimum": 1,
+                        "example": 2
+                    }
+                },
+                "type": "object"
+            },
+            "AuthResponse": {
+                "title": "Auth Response",
+                "description": "Data returned after user login or registration.",
                 "required": [
                     "user",
                     "access_token",
@@ -382,24 +462,24 @@
                 ],
                 "properties": {
                     "user": {
-                        "$ref": "#/components/schemas/User"
+                        "$ref": "#/components/schemas/UserResponse"
                     },
                     "access_token": {
-                        "description": "Access token.",
+                        "description": "Personal access token for API authentication.",
                         "type": "string",
                         "example": "1|eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
                     },
                     "token_type": {
-                        "description": "Type of the token for Authorization header.",
+                        "description": "Token type to be used in the Authorization header.",
                         "type": "string",
                         "example": "Bearer"
                     }
                 },
                 "type": "object"
             },
-            "User": {
-                "title": "User Schema",
-                "description": "User data returned by the API.",
+            "UserResponse": {
+                "title": "User Response",
+                "description": "Data for a user.",
                 "required": [
                     "id",
                     "name",
@@ -407,17 +487,17 @@
                 ],
                 "properties": {
                     "id": {
-                        "description": "The user ID.",
+                        "description": "Unique identifier of the user.",
                         "type": "integer",
                         "example": 1
                     },
                     "name": {
-                        "description": "The user name.",
+                        "description": "Full name of the user.",
                         "type": "string",
                         "example": "John Doe"
                     },
                     "email": {
-                        "description": "The user email.",
+                        "description": "Email address of the user.",
                         "type": "string",
                         "format": "email",
                         "example": "john@example.com"
@@ -425,9 +505,9 @@
                 },
                 "type": "object"
             },
-            "CartItem": {
-                "title": "Cart Item Schema",
-                "description": "Details of a cart item returned by the API.",
+            "CartItemResponse": {
+                "title": "Cart Item Response",
+                "description": "Data for a single item in the cart.",
                 "required": [
                     "id",
                     "price_snapshot",
@@ -437,36 +517,36 @@
                 ],
                 "properties": {
                     "id": {
-                        "description": "The product ID.",
+                        "description": "Unique identifier of the cart item.",
                         "type": "integer",
                         "example": 1
                     },
                     "price_snapshot": {
-                        "description": "The product price at the time it was added to the cart.",
+                        "description": "Product price at the time it was added to the cart.",
                         "type": "string",
                         "format": "float",
                         "example": 999.99
                     },
                     "quantity": {
-                        "description": "The quantity of the product in the cart.",
+                        "description": "Quantity of the product in the cart.",
                         "type": "integer",
                         "example": 2
                     },
                     "total_price": {
-                        "description": "The total price for this cart item (price_snapshot * quantity).",
+                        "description": "Total price for this item (price_snapshot * quantity).",
                         "type": "string",
                         "format": "float",
                         "example": 1999.98
                     },
                     "product": {
-                        "$ref": "#/components/schemas/Product"
+                        "$ref": "#/components/schemas/ProductResponse"
                     }
                 },
                 "type": "object"
             },
-            "Cart": {
-                "title": "Cart schema",
-                "description": "The cart data returned by the API.",
+            "CartResponse": {
+                "title": "Cart Response",
+                "description": "Data for a user cart.",
                 "required": [
                     "id",
                     "items",
@@ -475,34 +555,34 @@
                 ],
                 "properties": {
                     "id": {
-                        "description": "The cart ID.",
+                        "description": "Unique identifier of the cart.",
                         "type": "integer",
                         "example": 1
                     },
                     "items": {
-                        "description": "The cart items.",
+                        "description": "List of items in the cart.",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/CartItem"
+                            "$ref": "#/components/schemas/CartItemResponse"
                         }
                     },
                     "total_price": {
-                        "description": "The total price of the cart.",
+                        "description": "Total price of all items in the cart.",
                         "type": "string",
                         "format": "float",
                         "example": 1999.98
                     },
                     "total_count": {
-                        "description": "The total count of the cart.",
+                        "description": "Total number of items in the cart.",
                         "type": "integer",
                         "example": 2
                     }
                 },
                 "type": "object"
             },
-            "Product": {
-                "title": "Product Schema",
-                "description": "Details of a product returned by the API.",
+            "ProductResponse": {
+                "title": "Product Response",
+                "description": "Data for a product.",
                 "required": [
                     "id",
                     "name",

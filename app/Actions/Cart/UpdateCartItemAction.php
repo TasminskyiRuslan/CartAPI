@@ -10,7 +10,7 @@ use Throwable;
 class UpdateCartItemAction
 {
     /**
-     * Update the cart item quantity and refresh cart expiration.
+     * Update the quantity of a cart item.
      *
      * @param UpdateCartItemData $itemData
      * @param CartItem $item

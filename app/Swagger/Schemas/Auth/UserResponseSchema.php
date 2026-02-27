@@ -5,26 +5,26 @@ namespace App\Swagger\Schemas\Auth;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
-    schema: 'User',
-    title: 'User Schema',
-    description: 'User data returned by the API.',
+    schema: 'UserResponse',
+    title: 'User Response',
+    description: 'Data for a user.',
     required: ['id', 'name', 'email'],
     properties: [
         new OA\Property(
             property: 'id',
-            description: 'The user ID.',
+            description: 'Unique identifier of the user.',
             type: 'integer',
             example: 1
         ),
         new OA\Property(
             property: 'name',
-            description: 'The user name.',
+            description: 'Full name of the user.',
             type: 'string',
             example: 'John Doe'
         ),
         new OA\Property(
             property: 'email',
-            description: 'The user email.',
+            description: 'Email address of the user.',
             type: 'string',
             format: 'email',
             example: 'john@example.com'
@@ -32,7 +32,7 @@ use OpenApi\Attributes as OA;
     ],
     type: 'object'
 )]
-class UserSchema
+class UserResponseSchema
 {
 
 }
