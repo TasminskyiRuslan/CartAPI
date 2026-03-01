@@ -169,7 +169,7 @@ class CartItemController extends Controller
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_NOT_FOUND,
-                description: 'Cart item not found or does not belong to the user.'
+                description: 'Cart item not found.'
             ),
         ]
     )]

@@ -19,7 +19,7 @@ class CartController extends Controller
         path: '/cart',
         description: 'Returns the active cart for the authenticated user or guest.',
         summary: 'Get current cart',
-        security: [['sanctum' => []], ['guest_token' => []], []],
+        security: [['sanctum' => []], ['guest_token' => []]],
         tags: ['Cart'],
         responses: [
             new OA\Response(
