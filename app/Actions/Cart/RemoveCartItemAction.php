@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection ALL */
 
 namespace App\Actions\Cart;
 
@@ -6,7 +6,7 @@ use App\Models\CartItem;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class RemoveCartItemAction
+class  RemoveCartItemAction
 {
     /**
      * Remove a cart item and refresh the cart expiration.

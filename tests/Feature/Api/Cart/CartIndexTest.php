@@ -16,9 +16,9 @@ describe('CartController -> index', function () {
     | validation
     |--------------------------------------------------------------------------
     */
-    describe('success', function () {
+    describe('validation', function () {
 
-        it('fails when no user and no guest token', function () {
+        it('fails if neither user nor guest token is provided', function () {
             getJson(route('cart.index'))
                 ->assertUnauthorized()
                 ->assertJson(['message' => __('cart.errors.identification_missing')]);
@@ -32,7 +32,7 @@ describe('CartController -> index', function () {
     */
     describe('success', function () {
 
-        it('returns authenticated user cart with items', function () {
+        it('can retrieve the cart for an authenticated user', function () {
             $user = User::factory()->create();
             $userCart = Cart::factory()->for($user)->create();
             $userCartItems = CartItem::factory()->count(2)->for($userCart)->create();
@@ -61,7 +61,7 @@ describe('CartController -> index', function () {
                 ->assertJsonPath('data.total_price', '0.00');
         });
 
-        it('returns empty cart structure for authenticated user without cart', function () {
+        it('returns an empty cart structure if an authenticated user has no cart', function () {
             $user = User::factory()->create();
 
             Sanctum::actingAs($user);
@@ -75,11 +75,13 @@ describe('CartController -> index', function () {
                 ->assertJsonPath('data.total_price', '0.00');
         });
 
-        it('returns guest cart with items', function () {
+        it('can retrieve the cart for a guest user', function () {
             $guestCart = Cart::factory()->guest()->create();
             $guestCartItems = CartItem::factory()->count(2)->for($guestCart)->create();
 
-            getJson(route('cart.index'), [config('cart.guest_token_header') => $guestCart->guest_token])
+            getJson(route('cart.index'),
+                [config('cart.guest_token_header') => $guestCart->guest_token]
+            )
                 ->assertOk()
                 ->assertJsonStructure(['data' => cartJsonStructure()])
                 ->assertJsonPath('data.id', $guestCart->id)
@@ -89,7 +91,9 @@ describe('CartController -> index', function () {
         it('returns empty items for guest user with empty cart', function () {
             $guestCart = Cart::factory()->guest()->create();
 
-            getJson(route('cart.index'), [config('cart.guest_token_header') => $guestCart->guest_token])
+            getJson(route('cart.index'),
+                [config('cart.guest_token_header') => $guestCart->guest_token]
+            )
                 ->assertOk()
                 ->assertJsonStructure(['data' => cartJsonStructure()])
                 ->assertJsonPath('data.id', $guestCart->id)
@@ -98,8 +102,10 @@ describe('CartController -> index', function () {
                 ->assertJsonPath('data.total_price', '0.00');
         });
 
-        it('returns empty cart structure for guest user without cart', function () {
-            getJson(route('cart.index'), [config('cart.guest_token_header') => Str::uuid()->toString()])
+        it('returns an empty cart structure if a guest user has no cart', function () {
+            getJson(route('cart.index'),
+                [config('cart.guest_token_header') => Str::uuid()->toString()]
+            )
                 ->assertOk()
                 ->assertJsonStructure(['data' => cartJsonStructure()])
                 ->assertJsonPath('data.id', null)
@@ -108,9 +114,9 @@ describe('CartController -> index', function () {
                 ->assertJsonPath('data.total_price', '0.00');
         });
 
-        it('ignores expired cart for authenticated user', function () {
+        it('ignores the cart if it is expired for an authenticated user', function () {
             $user = User::factory()->create();
-            Cart::factory()->for($user)->expired()->create();
+            $userCart = Cart::factory()->for($user)->expired()->create();
 
             Sanctum::actingAs($user);
 
@@ -122,10 +128,12 @@ describe('CartController -> index', function () {
                 ->assertJsonPath('data.total_price', '0.00');
         });
 
-        it('ignores expired cart for guest user', function () {
+        it('ignores the cart if it is expired for a guest user', function () {
             $guestCart = Cart::factory()->guest()->expired()->create();
 
-            getJson(route('cart.index'), [config('cart.guest_token_header') => $guestCart->guest_token])
+            getJson(route('cart.index'),
+                [config('cart.guest_token_header') => $guestCart->guest_token]
+            )
                 ->assertOk()
                 ->assertJsonPath('data.id', null)
                 ->assertJsonPath('data.items', [])
@@ -140,10 +148,10 @@ describe('CartController -> index', function () {
     |--------------------------------------------------------------------------
     */
     describe('permission', function () {
-        it('prevents access to another user cart', function () {
+        it('prevents retrieving another user\'s cart', function () {
             $user = User::factory()->create();
             $anotherUser = User::factory()->create();
-            Cart::factory()->for($anotherUser)->create();
+            $anotherUserCart = Cart::factory()->for($anotherUser)->create();
 
             Sanctum::actingAs($user);
 
@@ -152,22 +160,26 @@ describe('CartController -> index', function () {
                 ->assertJsonPath('data.id', null);
         });
 
-        it('does not return another guest cart', function () {
-            Cart::factory()->guest()->create();
+        it('prevents retrieving another guest\'s cart', function () {
+            $guestCart = Cart::factory()->guest()->create();
 
-            getJson(route('cart.index'), [config('cart.guest_token_header') => Str::uuid()->toString()])
+            getJson(route('cart.index'),
+                [config('cart.guest_token_header') => Str::uuid()->toString()]
+            )
                 ->assertOk()
                 ->assertJsonPath('data.id', null);
         });
 
-        it('prioritizes authenticated user cart and ignores guest header', function () {
+        it('prioritizes the authenticated user over the guest header', function () {
             $user = User::factory()->create();
             $userCart = Cart::factory()->for($user)->create();
             $guestCart = Cart::factory()->guest()->create();
 
             Sanctum::actingAs($user);
 
-            getJson(route('cart.index'), [config('cart.guest_token_header') => $guestCart->guest_token])
+            getJson(route('cart.index'),
+                [config('cart.guest_token_header') => $guestCart->guest_token]
+            )
                 ->assertOk()
                 ->assertJsonPath('data.id', $userCart->id);
         });

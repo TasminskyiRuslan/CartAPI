@@ -185,6 +185,9 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Identification missing (user not logged in and no guest token provided)."
                     }
                 },
                 "security": [
@@ -201,12 +204,15 @@
                 "tags": [
                     "Cart"
                 ],
-                "summary": "Delete current cart",
-                "description": "Deletes the active cart for the authenticated user or guest.",
+                "summary": "Clear current cart",
+                "description": "Clears all items from the active cart for the authenticated user or guest.",
                 "operationId": "87ae7ca34713e7228f1422e3cafa31c5",
                 "responses": {
                     "204": {
-                        "description": "The cart deleted."
+                        "description": "All items in the cart have been removed."
+                    },
+                    "401": {
+                        "description": "Identification missing (user not logged in and no guest token provided)."
                     }
                 },
                 "security": [
@@ -268,6 +274,9 @@
                             }
                         }
                     },
+                    "401": {
+                        "description": "Identification missing (user not logged in and no guest token provided)."
+                    },
                     "422": {
                         "description": "Validation error."
                     }
@@ -283,6 +292,44 @@
             }
         },
         "/cart/items/{item}": {
+            "delete": {
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Remove specific item from cart",
+                "description": "Removes a specific product from the active cart.",
+                "operationId": "8dd6b96b45d834fc6d13648975453c0e",
+                "parameters": [
+                    {
+                        "name": "item",
+                        "in": "path",
+                        "description": "Cart item identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Item successfully removed from cart."
+                    },
+                    "401": {
+                        "description": "Identification missing (user not logged in and no guest token provided)."
+                    },
+                    "404": {
+                        "description": "Cart item not found or does not belong to the user."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    },
+                    {
+                        "guest_token": []
+                    }
+                ]
+            },
             "patch": {
                 "tags": [
                     "Cart"
@@ -329,6 +376,9 @@
                     },
                     "404": {
                         "description": "Cart item not found."
+                    },
+                    "401": {
+                        "description": "Identification missing (user not logged in and no guest token provided)."
                     },
                     "422": {
                         "description": "Validation error."

@@ -10,12 +10,12 @@ uses(RefreshDatabase::class);
 
 describe('MergeCartOnAuthenticationListener', function () {
 
-    it('skips merging when guest token is missing', function () {
+    it('skips merging if the guest token is missing from headers', function () {
         $this->mock(MergeCartAction::class)->shouldNotReceive('handle');
         event(new Login(config('auth.defaults.guard'), User::factory()->make(), false));
     });
 
-    it('triggers merge action when guest token is present', function () {
+    it('triggers the merge action if the guest token is present in headers', function () {
         $guestToken = Str::uuid()->toString();
         request()->headers->set(config('cart.guest_token_header'), $guestToken);
 

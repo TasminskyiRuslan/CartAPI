@@ -15,7 +15,7 @@ describe('LogoutController', function () {
     |--------------------------------------------------------------------------
     */
     describe('success', function () {
-        it('logs out authenticated user and revokes tokens', function () {
+        it('can log out an authenticated user and revoke tokens', function () {
             $user = User::factory()->create();
 
             Sanctum::actingAs($user);
@@ -33,7 +33,7 @@ describe('LogoutController', function () {
     |--------------------------------------------------------------------------
     */
     describe('permissions', function () {
-        it('prevents logout for unauthenticated user', function () {
+        it('prevents logout for an unauthenticated user', function () {
             deleteJson(route('auth.logout'))
                 ->assertUnauthorized();
         });

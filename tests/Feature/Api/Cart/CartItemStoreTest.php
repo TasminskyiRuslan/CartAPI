@@ -19,19 +19,23 @@ describe('CartItemController -> store', function () {
     */
     describe('validation', function () {
 
-        it('fails when required fields are missing', function () {
-            postJson(route('cart.item.store'), [], [config('cart.guest_token_header') => Str::uuid()->toString()])
+        it('fails if required fields are missing', function () {
+            postJson(route('cart.item.store'), [],
+                [config('cart.guest_token_header') => Str::uuid()->toString()]
+            )
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['product_id']);
         });
 
-        it('fails when product does not exist', function () {
-            postJson(route('cart.item.store'), ['product_id' => 99999], [config('cart.guest_token_header') => Str::uuid()->toString()])
+        it('fails if the product does not exist', function () {
+            postJson(route('cart.item.store'), ['product_id' => 99999],
+                [config('cart.guest_token_header') => Str::uuid()->toString()]
+            )
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['product_id']);
         });
 
-        it('fails when quantity is less than 1', function () {
+        it('fails if the quantity is less than 1', function () {
             $product = Product::factory()->create();
 
             postJson(route('cart.item.store'), [
@@ -42,7 +46,7 @@ describe('CartItemController -> store', function () {
                 ->assertJsonValidationErrors(['quantity']);
         });
 
-        it('fails when quantity is not as integer', function () {
+        it('fails if the quantity is not an integer', function () {
             $product = Product::factory()->create();
 
             postJson(route('cart.item.store'), [
@@ -53,7 +57,7 @@ describe('CartItemController -> store', function () {
                 ->assertJsonValidationErrors(['quantity']);
         });
 
-        it('fails when quantity exceeds the maximum limit (99)', function () {
+        it('fails if the quantity exceeds the maximum limit', function () {
             $product = Product::factory()->create();
             $max = config('cart.max_quantity');
 
@@ -65,7 +69,7 @@ describe('CartItemController -> store', function () {
                 ->assertJsonValidationErrors(['quantity']);
         });
 
-        it('fails when no user and no guest token', function () {
+        it('fails if neither user nor guest token is provided', function () {
             $product = Product::factory()->create();
 
             postJson(route('cart.item.store'), ['product_id' => $product->id])
@@ -81,7 +85,7 @@ describe('CartItemController -> store', function () {
     */
     describe('success', function () {
 
-        it('adds new item with default quantity when not provided', function () {
+        it('adds a new item with default quantity if not provided', function () {
             $user = User::factory()->create();
             $product = Product::factory()->create(['price' => '500.00']);
 
@@ -98,7 +102,7 @@ describe('CartItemController -> store', function () {
                 ->assertJsonPath('data.total_price', $product->price);
         });
 
-        it('creates new cart and adds item for an authenticated user', function () {
+        it('creates a new cart and adds an item for an authenticated user', function () {
             $user = User::factory()->create();
             $product = Product::factory()->create(['price' => '100.00']);
             $quantity = 4;
@@ -130,7 +134,7 @@ describe('CartItemController -> store', function () {
             ]);
         });
 
-        it('creates new cart and adds item for a guest user', function () {
+        it('creates a new cart and adds an item for a guest user', function () {
             $guestToken = Str::uuid()->toString();
             $product = Product::factory()->create(['price' => '500.00']);
             $quantity = 4;
@@ -160,7 +164,7 @@ describe('CartItemController -> store', function () {
             ]);
         });
 
-        it('adds item to existing cart for an authenticated user without duplicating cart', function () {
+        it('adds an item to an existing cart for an authenticated user without duplicating the cart', function () {
             $user = User::factory()->create();
             $product = Product::factory()->create();
             $userCart = Cart::factory()->for($user)->create();
@@ -182,7 +186,7 @@ describe('CartItemController -> store', function () {
             expect(Cart::whereUserId($user->id)->count())->toBe(1);
         });
 
-        it('adds item to existing cart for a guest user without duplicating cart', function () {
+        it('adds an item to an existing cart for a guest user without duplicating the cart', function () {
             $guestCart = Cart::factory()->guest()->create();
             $product = Product::factory()->create();
             $quantity = 4;
@@ -201,7 +205,7 @@ describe('CartItemController -> store', function () {
             expect(Cart::whereGuestToken($guestCart->guest_token)->count())->toBe(1);
         });
 
-        it('increments quantity of existing item', function () {
+        it('increments the quantity of an existing item in the cart', function () {
             $user = User::factory()->create();
             $product = Product::factory()->create(['price' => '500.00']);
             $userCart = Cart::factory()->for($user)->create();
@@ -233,7 +237,7 @@ describe('CartItemController -> store', function () {
             ]);
         });
 
-        it('preserves original price snapshot when product price changes', function () {
+        it('preserves the original price snapshot when the product price changes', function () {
             $user = User::factory()->create();
             $originalPrice = '500.00';
             $product = Product::factory()->create(['price' => $originalPrice]);
@@ -261,7 +265,7 @@ describe('CartItemController -> store', function () {
             expect($userCartItem->refresh()->price_snapshot)->toBe($originalPrice);
         });
 
-        it('replaces expired cart with new one when adding item', function () {
+        it('replaces expired cart for an authenticated user when adding an item', function () {
             $user = User::factory()->create();
             $product = Product::factory()->create();
             $expiredCart = Cart::factory()->for($user)->expired()->create();
@@ -271,15 +275,25 @@ describe('CartItemController -> store', function () {
             postJson(route('cart.item.store'), ['product_id' => $product->id])
                 ->assertCreated();
 
-            $this->assertDatabaseMissing('carts', [
-                'id' => $expiredCart->id,
-            ]);
-            $this->assertDatabaseHas('carts', [
-                'user_id' => $user->id,
-            ]);
+            $this->assertDatabaseMissing('carts', ['id' => $expiredCart->id]);
+            $this->assertDatabaseHas('carts', ['user_id' => $user->id]);
         });
 
-        it('refreshes the cart expiration date when a new item is added', function () {
+        it('replaces expired cart for guest user when adding an item', function () {
+            $product = Product::factory()->create();
+            $guestCart = Cart::factory()->guest()->expired()->create();
+
+            postJson(route('cart.item.store'),
+                ['product_id' => $product->id],
+                [config('cart.guest_token_header') => $guestCart->guest_token]
+            )
+                ->assertCreated();
+
+            $this->assertDatabaseMissing('carts', ['id' => $guestCart->id]);
+            $this->assertDatabaseHas('carts', ['guest_token' => $guestCart->guest_token]);
+        });
+
+        it('refreshes the cart expiration date after adding an item', function () {
             $user = User::factory()->create();
             $product = Product::factory()->create();
             $initialExpiration = now()->addHour();
@@ -293,7 +307,7 @@ describe('CartItemController -> store', function () {
             expect($userCart->refresh()->expires_at->gt($initialExpiration))->toBeTrue();
         });
 
-        it('refreshes the cart expiration date when a new item is updated', function () {
+        it('refreshes the cart expiration date after updating an item', function () {
             $user = User::factory()->create();
             $product = Product::factory()->create();
             $initialExpiration = now()->addHour();
@@ -308,7 +322,7 @@ describe('CartItemController -> store', function () {
             expect($userCart->refresh()->expires_at->gt($initialExpiration))->toBeTrue();
         });
 
-        it('caps quantity to maximum limit during cumulative addition', function () {
+        it('caps the quantity to the maximum limit during cumulative addition', function () {
             $user = User::factory()->create();
             $product = Product::factory()->create();
             $userCart = Cart::factory()->for($user)->create();
@@ -333,6 +347,34 @@ describe('CartItemController -> store', function () {
                 'product_id' => $userCartItem->product_id,
                 'quantity' => $max,
             ]);
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | permission
+    |--------------------------------------------------------------------------
+    */
+    describe('permission', function () {
+        it('prioritizes the authenticated user over the guest header', function () {
+            $user = User::factory()->create();
+            $product = Product::factory()->create();
+            $guestCart = Cart::factory()->guest()->create();
+
+            Sanctum::actingAs($user);
+
+            postJson(route('cart.item.store'),
+                ['product_id' => $product->id],
+                [config('cart.guest_token_header') => $guestCart->guest_token]
+            )
+                ->assertCreated();
+
+            $this->assertDatabaseHas('cart_items', [
+                'product_id' => $product->id,
+                'cart_id' => Cart::whereUserId($user->id)->first()->id,
+            ]);
+
+            $this->assertDatabaseMissing('cart_items', ['cart_id' => $guestCart->id]);
         });
     });
 })->group('cart');

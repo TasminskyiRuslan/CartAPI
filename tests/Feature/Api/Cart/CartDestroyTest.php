@@ -17,8 +17,7 @@ describe('CartController -> destroy', function () {
     |--------------------------------------------------------------------------
     */
     describe('validation', function () {
-        it('fails when no user and no guest token', function () {
-
+        it('fails if neither user nor guest token is provided', function () {
             deleteJson(route('cart.destroy'))
                 ->assertUnauthorized()
                 ->assertJson(['message' => __('cart.errors.identification_missing')]);
@@ -32,7 +31,7 @@ describe('CartController -> destroy', function () {
     */
     describe('success', function () {
 
-        it('deletes authenticated user cart with items', function () {
+        it('can clear all items from the cart for an authenticated user', function () {
             $user = User::factory()->create();
             $userCart = Cart::factory()->for($user)->create();
             $userCartItem = CartItem::factory()->count(7)->for($userCart)->create();
@@ -42,30 +41,24 @@ describe('CartController -> destroy', function () {
             deleteJson(route('cart.destroy'))
                 ->assertNoContent();
 
-            $this->assertDatabaseHas('carts', [
-                'id' => $userCart->id,
-            ]);
-            $this->assertDatabaseMissing('cart_items', [
-                'cart_id' => $userCart->id,
-            ]);
+            $this->assertDatabaseHas('carts', ['id' => $userCart->id]);
+            $this->assertDatabaseMissing('cart_items', ['cart_id' => $userCart->id]);
         });
 
-        it('deletes guest cart with items', function () {
+        it('can clear all items from the cart for a guest user', function () {
             $guestCart = Cart::factory()->guest()->create();
-            CartItem::factory()->count(2)->for($guestCart)->create();
+            $guestCartItem = CartItem::factory()->count(2)->for($guestCart)->create();
 
-            deleteJson(route('cart.destroy'), [], [config('cart.guest_token_header') => $guestCart->guest_token])
+            deleteJson(route('cart.destroy'), [],
+                [config('cart.guest_token_header') => $guestCart->guest_token]
+            )
                 ->assertNoContent();
 
-            $this->assertDatabaseHas('carts', [
-                'id' => $guestCart->id,
-            ]);
-            $this->assertDatabaseMissing('cart_items', [
-                'cart_id' => $guestCart->id,
-            ]);
+            $this->assertDatabaseHas('carts', ['id' => $guestCart->id]);
+            $this->assertDatabaseMissing('cart_items', ['cart_id' => $guestCart->id]);
         });
 
-        it('returns no content when authenticated user cart does not exist', function () {
+        it('returns no content if the authenticated user has no cart', function () {
             $user = User::factory()->create();
 
             Sanctum::actingAs($user);
@@ -74,12 +67,14 @@ describe('CartController -> destroy', function () {
                 ->assertNoContent();
         });
 
-        it('returns no content when guest cart does not exist', function () {
-            deleteJson(route('cart.destroy'), [], [config('cart.guest_token_header') => Str::uuid()->toString()])
+        it('returns no content if the guest user has no cart', function () {
+            deleteJson(route('cart.destroy'), [],
+                [config('cart.guest_token_header') => Str::uuid()->toString()]
+            )
                 ->assertNoContent();
         });
 
-        it('returns no content when cart is expired', function () {
+        it('ignores the request if the cart is expired', function () {
             $user = User::factory()->create();
             $expiredCart = Cart::factory()->expired()->for($user)->create();
             $expiredCartItems = CartItem::factory()->count(3)->for($expiredCart)->create();
@@ -89,12 +84,8 @@ describe('CartController -> destroy', function () {
             deleteJson(route('cart.destroy'))
                 ->assertNoContent();
 
-            $this->assertDatabaseHas('carts', [
-                'id' => $expiredCart->id,
-            ]);
-            $this->assertDatabaseHas('cart_items', [
-                'cart_id' => $expiredCart->id,
-            ]);
+            $this->assertDatabaseHas('carts', ['id' => $expiredCart->id]);
+            $this->assertDatabaseHas('cart_items', ['cart_id' => $expiredCart->id]);
         });
     });
 
@@ -105,20 +96,36 @@ describe('CartController -> destroy', function () {
     */
     describe('permission', function () {
 
-        it('does not delete cart belonging to another user', function () {
+        it('prevents clearing another user\'s cart', function () {
             $user = User::factory()->create();
             $userCart = Cart::factory()->for($user)->create();
             $guestCart = Cart::factory()->guest()->create();
 
-            deleteJson(route('cart.destroy'), [], [config('cart.guest_token_header') => $guestCart->guest_token])
+            deleteJson(route('cart.destroy'), [],
+                [config('cart.guest_token_header') => $guestCart->guest_token]
+            )
                 ->assertNoContent();
 
-            $this->assertDatabaseHas('carts', [
-                'id' => $guestCart->id,
-            ]);
-            $this->assertDatabaseHas('carts', [
-                'id' => $userCart->id,
-            ]);
+            $this->assertDatabaseHas('carts', ['id' => $guestCart->id]);
+            $this->assertDatabaseHas('carts', ['id' => $userCart->id]);
         });
+    });
+
+    it('prioritizes the authenticated user over the guest header', function () {
+        $user = User::factory()->create();
+        $userCart = Cart::factory()->for($user)->create();
+        $userCartItem = CartItem::factory()->count(2)->for($userCart)->create();
+        $guestCart = Cart::factory()->guest()->create();
+        $guestCartItem = CartItem::factory()->count(2)->for($guestCart)->create();
+
+        Sanctum::actingAs($user);
+
+        deleteJson(route('cart.destroy'), [],
+            [config('cart.guest_token_header') => $guestCart->guest_token]
+        )
+            ->assertNoContent();
+
+        $this->assertDatabaseMissing('cart_items', ['cart_id' => $userCart->id]);
+        $this->assertDatabaseHas('cart_items', ['cart_id' => $guestCart->id]);
     });
 })->group('cart');

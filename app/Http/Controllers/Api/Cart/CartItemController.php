@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection ALL */
 
 namespace App\Http\Controllers\Api\Cart;
 
@@ -53,6 +53,10 @@ class CartItemController extends Controller
                         )
                     ]
                 )
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNAUTHORIZED,
+                description: 'Identification missing (user not logged in and no guest token provided).'
             ),
             new OA\Response(
                 response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
@@ -113,6 +117,10 @@ class CartItemController extends Controller
                 description: 'Cart item not found.',
             ),
             new OA\Response(
+                response: SymfonyResponse::HTTP_UNAUTHORIZED,
+                description: 'Identification missing (user not logged in and no guest token provided).'
+            ),
+            new OA\Response(
                 response: SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY,
                 description: 'Validation error.'
             ),
@@ -135,6 +143,36 @@ class CartItemController extends Controller
             ->setStatusCode(SymfonyResponse::HTTP_OK);
     }
 
+    #[OA\Delete(
+        path: '/cart/items/{item}',
+        description: 'Removes a specific product from the active cart.',
+        summary: 'Remove specific item from cart',
+        security: [['sanctum' => []], ['guest_token' => []]],
+        tags: ['Cart'],
+        parameters: [
+            new OA\Parameter(
+                name: 'item',
+                description: 'Cart item identifier',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: SymfonyResponse::HTTP_NO_CONTENT,
+                description: 'Item successfully removed from cart.'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNAUTHORIZED,
+                description: 'Identification missing (user not logged in and no guest token provided).'
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_NOT_FOUND,
+                description: 'Cart item not found or does not belong to the user.'
+            ),
+        ]
+    )]
     /**
      * Remove a specific item from the cart.
      *

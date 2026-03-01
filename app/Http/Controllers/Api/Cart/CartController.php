@@ -34,6 +34,10 @@ class CartController extends Controller
                     ]
                 )
             ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNAUTHORIZED,
+                description: 'Identification missing (user not logged in and no guest token provided).'
+            ),
         ]
     )]
     /**
@@ -61,7 +65,11 @@ class CartController extends Controller
             new OA\Response(
                 response: SymfonyResponse::HTTP_NO_CONTENT,
                 description: 'All items in the cart have been removed.'
-            )
+            ),
+            new OA\Response(
+                response: SymfonyResponse::HTTP_UNAUTHORIZED,
+                description: 'Identification missing (user not logged in and no guest token provided).'
+            ),
         ]
     )]
     /**

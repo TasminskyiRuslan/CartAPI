@@ -77,7 +77,7 @@ class CartItem extends Model
                 $query->active();
                 if (auth()->check()) {
                     $query->where('user_id', auth()->id());
-                } else {
+                } elseif (request()->header(config('cart.guest_token_header'))) {
                     $query->where('guest_token', request()->header(config('cart.guest_token_header')));
                 }
             })

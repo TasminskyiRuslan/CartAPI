@@ -15,13 +15,13 @@ describe('LoginController', function () {
     */
     describe('validation', function () {
 
-        it('fails when required fields are missing', function () {
+        it('fails if required fields are missing', function () {
             postJson(route('auth.login'), [])
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors(['email', 'password']);
         });
 
-        it('fails when email does not exist', function () {
+        it('fails if the email does not exist', function () {
             postJson(route('auth.login'), [
                 'email' => 'nonexistent@example.com',
                 'password' => 'password123',
@@ -30,7 +30,7 @@ describe('LoginController', function () {
                 ->assertJsonValidationErrors(['email']);
         });
 
-        it('fails when email format is invalid', function () {
+        it('fails if the email format is invalid', function () {
             postJson(route('auth.login'), [
                 'email' => 'invalid-email',
                 'password' => 'password123',
@@ -39,7 +39,7 @@ describe('LoginController', function () {
                 ->assertJsonValidationErrors(['email']);
         });
 
-        it('fails when password is incorrect', function () {
+        it('fails if the password is incorrect', function () {
             $user = User::factory()->create();
 
             postJson(route('auth.login'), [
@@ -58,12 +58,10 @@ describe('LoginController', function () {
     */
     describe('success', function () {
 
-        it('authenticates user and returns access token', function () {
+        it('can authenticate a user and return an access token', function () {
             $password = 'password123';
 
-            $user = User::factory()->create([
-                'password' => $password,
-            ]);
+            $user = User::factory()->create(['password' => $password,]);
 
             $data = [
                 'email' => $user->email,
@@ -73,9 +71,7 @@ describe('LoginController', function () {
             postJson(route('auth.login'), $data)
                 ->assertOk()
                 ->assertJsonPath('data.user.email', $data['email'])
-                ->assertJsonStructure([
-                    'data' => authJsonStructure()
-                ]);
+                ->assertJsonStructure(['data' => authJsonStructure()]);
         });
     });
 
