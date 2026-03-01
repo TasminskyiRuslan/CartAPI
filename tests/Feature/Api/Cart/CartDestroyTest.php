@@ -16,7 +16,7 @@ describe('CartController -> destroy', function () {
     | validation
     |--------------------------------------------------------------------------
     */
-    describe('success', function () {
+    describe('validation', function () {
         it('fails when no user and no guest token', function () {
 
             deleteJson(route('cart.destroy'))
@@ -42,7 +42,7 @@ describe('CartController -> destroy', function () {
             deleteJson(route('cart.destroy'))
                 ->assertNoContent();
 
-            $this->assertDatabaseMissing('carts', [
+            $this->assertDatabaseHas('carts', [
                 'id' => $userCart->id,
             ]);
             $this->assertDatabaseMissing('cart_items', [
@@ -57,7 +57,7 @@ describe('CartController -> destroy', function () {
             deleteJson(route('cart.destroy'), [], [config('cart.guest_token_header') => $guestCart->guest_token])
                 ->assertNoContent();
 
-            $this->assertDatabaseMissing('carts', [
+            $this->assertDatabaseHas('carts', [
                 'id' => $guestCart->id,
             ]);
             $this->assertDatabaseMissing('cart_items', [
@@ -79,17 +79,21 @@ describe('CartController -> destroy', function () {
                 ->assertNoContent();
         });
 
-        it('deletes the cart even if it is already expired', function () {
+        it('returns no content when cart is expired', function () {
             $user = User::factory()->create();
             $expiredCart = Cart::factory()->expired()->for($user)->create();
+            $expiredCartItems = CartItem::factory()->count(3)->for($expiredCart)->create();
 
             Sanctum::actingAs($user);
 
             deleteJson(route('cart.destroy'))
                 ->assertNoContent();
 
-            $this->assertDatabaseMissing('carts', [
+            $this->assertDatabaseHas('carts', [
                 'id' => $expiredCart->id,
+            ]);
+            $this->assertDatabaseHas('cart_items', [
+                'cart_id' => $expiredCart->id,
             ]);
         });
     });
@@ -109,7 +113,7 @@ describe('CartController -> destroy', function () {
             deleteJson(route('cart.destroy'), [], [config('cart.guest_token_header') => $guestCart->guest_token])
                 ->assertNoContent();
 
-            $this->assertDatabaseMissing('carts', [
+            $this->assertDatabaseHas('carts', [
                 'id' => $guestCart->id,
             ]);
             $this->assertDatabaseHas('carts', [

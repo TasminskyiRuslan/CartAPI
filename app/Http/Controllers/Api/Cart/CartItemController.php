@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Cart;
 
 use App\Actions\Cart\AddCartItemAction;
+use App\Actions\Cart\RemoveCartItemAction;
 use App\Actions\Cart\UpdateCartItemAction;
 use App\Data\Cart\Context\CartIdentifierData;
 use App\Data\Cart\Requests\CreateCartItemData;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Cart\CartResource;
 use App\Models\CartItem;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Throwable;
@@ -117,7 +119,7 @@ class CartItemController extends Controller
         ]
     )]
     /**
-     * Update the specified resource in storage.
+     * Update the quantity of a specific cart item.
      *
      * @param UpdateCartItemData $cartItemData
      * @param CartItem $item
@@ -134,10 +136,16 @@ class CartItemController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove a specific item from the cart.
+     *
+     * @param CartItem $item
+     * @param RemoveCartItemAction $removeCartItemAction
+     * @return Response
+     * @throws Throwable
      */
-    public function destroy(CartItem $item)
+    public function destroy(CartItem $item, RemoveCartItemAction $removeCartItemAction): Response
     {
-        //
+        $removeCartItemAction->handle($item);
+        return response()->noContent();
     }
 }

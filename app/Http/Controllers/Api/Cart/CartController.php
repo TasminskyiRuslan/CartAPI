@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\Cart;
 
-use App\Actions\Cart\DeleteCartAction;
+use App\Actions\Cart\ClearCartAction;
 use App\Actions\Cart\FindCartAction;
 use App\Data\Cart\Context\CartIdentifierData;
 use App\Http\Controllers\Controller;
@@ -37,7 +37,7 @@ class CartController extends Controller
         ]
     )]
     /**
-     * Retrieve the current active cart.
+     * Clear all items from the current active cart.
      *
      * @param Request $request
      * @param FindCartAction $findCartAction
@@ -53,14 +53,14 @@ class CartController extends Controller
 
     #[OA\Delete(
         path: '/cart',
-        description: 'Deletes the active cart for the authenticated user or guest.',
-        summary: 'Delete current cart',
+        description: 'Clears all items from the active cart for the authenticated user or guest.',
+        summary: 'Clear current cart',
         security: [['sanctum' => []], ['guest_token' => []]],
         tags: ['Cart'],
         responses: [
             new OA\Response(
                 response: SymfonyResponse::HTTP_NO_CONTENT,
-                description: 'The cart deleted.'
+                description: 'All items in the cart have been removed.'
             )
         ]
     )]
@@ -68,12 +68,12 @@ class CartController extends Controller
      * Delete the current active cart.
      *
      * @param Request $request
-     * @param DeleteCartAction $deleteCartAction
+     * @param ClearCartAction $clearCartAction
      * @return Response
      */
-    public function destroy(Request $request, DeleteCartAction $deleteCartAction): Response
+    public function destroy(Request $request, ClearCartAction $clearCartAction): Response
     {
-        $deleteCartAction->handle(CartIdentifierData::fromRequest($request));
+        $clearCartAction->handle(CartIdentifierData::fromRequest($request));
         return response()->noContent();
     }
 }

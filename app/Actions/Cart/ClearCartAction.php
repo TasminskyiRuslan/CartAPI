@@ -5,16 +5,16 @@ namespace App\Actions\Cart;
 use App\Data\Cart\Context\CartIdentifierData;
 use App\Models\Cart;
 
-class DeleteCartAction
+class ClearCartAction
 {
     /**
-     * Delete the active cart for the given identifier.
+     * Remove all items from the active cart for the given identifier.
      *
      * @param CartIdentifierData $identifierData
      * @return void
      */
     public function handle(CartIdentifierData $identifierData): void
     {
-        Cart::forOwner($identifierData)->delete();
+        Cart::forOwner($identifierData)->active()->first()?->items()->delete();
     }
 }

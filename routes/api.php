@@ -50,6 +50,10 @@ Route::middleware('check.cart.owner')->prefix('cart')->group(callback: function 
         // Cart item update action
         Route::patch('/{item}', [CartItemController::class, 'update'])
             ->name('cart.item.update');
+
+        // Cart item delete action
+        Route::delete('/{item}', [CartItemController::class, 'destroy'])
+            ->name('cart.item.destroy');
     });
 })
     ->scopeBindings();
