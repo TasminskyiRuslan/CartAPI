@@ -41,6 +41,10 @@ cd CartAPI
 
 ```bash
 cp .env.example .env
+
+# Sync your local user ID with Docker to avoid permission issues
+echo "UID=$(id -u)" >> .env
+echo "GID=$(id -g)" >> .env
 ```
 
 ### 3. Start containers
@@ -139,8 +143,11 @@ tests/                     # Feature and Unit tests (Pest)
 ### Relations
 
 * **User** `hasOne` **Cart**
-* **Product** `hasMany` **CartItem**
+* **Cart** `belongsTo` **User** (nullable for guest carts)
 * **Cart** `hasMany` **CartItem**
+* **CartItem** `belongsTo` **Cart**
+* **Product** `hasMany` **CartItem**
+* **CartItem** `belongsTo` **Product**
 
 ---
 

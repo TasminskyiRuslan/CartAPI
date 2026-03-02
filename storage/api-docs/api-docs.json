@@ -196,8 +196,7 @@
                     },
                     {
                         "guest_token": []
-                    },
-                    {}
+                    }
                 ]
             },
             "delete": {
@@ -318,7 +317,7 @@
                         "description": "Identification missing (user not logged in and no guest token provided)."
                     },
                     "404": {
-                        "description": "Cart item not found or does not belong to the user."
+                        "description": "Cart item not found."
                     }
                 },
                 "security": [
